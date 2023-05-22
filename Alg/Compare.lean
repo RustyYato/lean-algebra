@@ -37,10 +37,10 @@ class Compare (α: Sort _) where
   ord (_ _: α) : Order
 
   ord_transitive {{ o: Order }} (_: ord a b = o) (_: ord b c = o) : (ord a c = o)
-  ord_flip : (ord a b) = (ord b a).flip
+  ord_flip (a b: α) : (ord a b) = (ord b a).flip
 
-  ord_id : (ord a a = Order.Eq) 
-  ord_implies_eq (_: ord a b = Order.Eq) : a = b
+  ord_id (a: α) : (ord a a = Order.Eq) 
+  ord_to_eq (_: ord a b = Order.Eq) : a = b
 
   lt a b := ord a b = Order.Less
 
@@ -56,9 +56,9 @@ instance ord_le [Compare α] : LE α where
 
 theorem Compare.ord_symm {{ α: Sort _ }} [Compare α] (a b: α) : ord a b = Order.Eq -> ord b a = Order.Eq := by
   intro ab_eq
-  have ab_eq := ord_implies_eq ab_eq
+  have ab_eq := ord_to_eq ab_eq
   rw [ab_eq]
-  exact ord_id
+  exact ord_id _
 
 #print axioms Compare.ord_symm
 
@@ -103,7 +103,7 @@ def Compare.ord_ne_transitive {{ α: Sort _ }} [Compare α] {{ a b c : α }} {{ 
                 rw [ac_less] at ac_eq
                 contradiction
               | .Greater =>
-                have a_eq_b := ord_implies_eq h₀
+                have a_eq_b := ord_to_eq h₀
                 rw [←a_eq_b] at h₁
                 rw [ac_less] at h₁
                 contradiction
@@ -111,7 +111,7 @@ def Compare.ord_ne_transitive {{ α: Sort _ }} [Compare α] {{ a b c : α }} {{ 
           match h₁:ord b c with  
             | .Less => contradiction
             | .Eq =>
-              have a_eq_b := ord_implies_eq h₁
+              have a_eq_b := ord_to_eq h₁
               rw [a_eq_b] at h₀
               rw [ac_less] at h₀
               contradiction
@@ -129,7 +129,7 @@ def Compare.ord_ne_transitive {{ α: Sort _ }} [Compare α] {{ a b c : α }} {{ 
               rw [ac_greater] at ac_eq
               contradiction
             | .Eq =>
-              have a_eq_b := ord_implies_eq h₁
+              have a_eq_b := ord_to_eq h₁
               rw [a_eq_b] at h₀
               rw [ac_greater] at h₀
               contradiction
@@ -137,7 +137,7 @@ def Compare.ord_ne_transitive {{ α: Sort _ }} [Compare α] {{ a b c : α }} {{ 
         | .Eq =>
             match h₁:ord b c with  
               | .Less => 
-                have a_eq_b := ord_implies_eq h₀
+                have a_eq_b := ord_to_eq h₀
                 rw [←a_eq_b] at h₁
                 rw [ac_greater] at h₁
                 contradiction
@@ -160,7 +160,7 @@ def Compare.ord_from_eq {{ α: Sort _ }} [Compare α] {{ a b : α }} : a = b -> 
 def Compare.le_id {{ α: Sort _ }} [Compare α] {{ a: α }} :
   a <= a := by
   apply Or.inr
-  exact Compare.ord_id
+  exact Compare.ord_id _
 
 #print axioms Compare.le_id
 
@@ -181,11 +181,11 @@ def Compare.le_trans {{ α: Sort _ }} [Compare α] {{ a b c: α }} :
   assumption
   assumption
   apply Or.inl
-  have b_eq_c : b = c := Compare.ord_implies_eq (by assumption)
+  have b_eq_c : b = c := Compare.ord_to_eq (by assumption)
   rw [←b_eq_c]
   assumption
   apply Or.inl
-  have a_eq_b : a = b := Compare.ord_implies_eq (by assumption)
+  have a_eq_b : a = b := Compare.ord_to_eq (by assumption)
   rw [a_eq_b]
   assumption
   apply Or.inr
@@ -200,7 +200,7 @@ def Compare.lt_le_trans {{ α: Sort _ }} [Compare α] {{ a b c: α }} :
   apply @Compare.lt_trans _ _ a b c
   assumption
   assumption
-  have b_eq_c : b = c := Compare.ord_implies_eq (by assumption)
+  have b_eq_c : b = c := Compare.ord_to_eq (by assumption)
   rw [←b_eq_c]
   assumption
 
@@ -213,7 +213,7 @@ def Compare.le_lt_trans {{ α: Sort _ }} [Compare α] {{ a b c: α }} :
   apply Compare.lt_trans
   assumption
   assumption
-  have a_eq_b : a = b := Compare.ord_implies_eq (by assumption)
+  have a_eq_b : a = b := Compare.ord_to_eq (by assumption)
   rw [a_eq_b]
   assumption
 
@@ -271,7 +271,7 @@ instance Compare.dec_eq [Compare α] (a b: α) : Decidable (a = b) := by
     contradiction
   | .Eq =>
     apply Decidable.isTrue
-    apply Compare.ord_implies_eq
+    apply Compare.ord_to_eq
     assumption
 
 #print axioms Compare.dec_eq
