@@ -102,6 +102,33 @@ def nat.of_mul_irr { a b c: nat } : a * c = b * c -> c ≠ .zero -> a = b := fun
     
 #print axioms nat.of_mul_irr
 
+def nat.mul_eq_zero { a b: nat } : a * b = .zero -> a = .zero ∨ b = .zero  := fun ab_eq_zero => match a, b with
+  | .zero, _ => Or.inl rfl
+  | _, .zero => Or.inr rfl
+  | .inc _, .inc _ => by
+    rw [nat.mul_inc_left, nat.add_inc_left] at ab_eq_zero
+    contradiction
+
+#print axioms nat.mul_eq_zero
+
+def nat.mul_eq_one { a b: nat } : a * b = nat.zero.inc -> a = nat.zero.inc ∧ b = nat.zero.inc  := fun ab_eq_one => by match a, b with
+  | .zero,  _ => 
+    rw [nat.mul_zero_left] at ab_eq_one
+    contradiction
+  | _, .zero =>  
+    rw [nat.mul_zero_right] at ab_eq_one
+    contradiction
+  | .inc a₀, .inc b₀  =>
+    rw [nat.mul_inc_left,
+        nat.mul_inc_right,
+        nat.add_inc_left] at ab_eq_one
+    have ab_eq_one := nat.of_inc_irr ab_eq_one
+    have ⟨ b₀_eq_zero, a₀_plus_ab_eq_zero ⟩ := nat.add_eq_zero ab_eq_one
+    have ⟨ a₀_eq_zero, _ ⟩ := nat.add_eq_zero a₀_plus_ab_eq_zero
+    apply And.intro <;> (apply nat.to_inc_irr; assumption)
+
+#print axioms nat.mul_eq_one
+
 def nat.mul_comm (a b: nat) : a * b = b * a := by
   cases a
   rw [nat.mul_zero_left, nat.mul_zero_right]
