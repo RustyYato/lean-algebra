@@ -53,13 +53,13 @@ theorem nat.to_le_add_left_irr (a b: nat) : a <= b -> x + a <= x + b := by
 
 #print axioms nat.to_le_add_left_irr
 
-theorem nat.of_lt_add_left_irr (a b: nat) : x + a < x + b -> a < b := by
+theorem nat.of_lt_add_left_irr {a b: nat} : x + a < x + b -> a < b := by
   intro a_lt_b
   cases x
   exact a_lt_b
   rw [nat.add_inc_left, nat.add_inc_left] at a_lt_b
   have a_lt_b := nat.of_lt_inc_irr a_lt_b
-  exact nat.of_lt_add_left_irr _ _ a_lt_b
+  exact nat.of_lt_add_left_irr a_lt_b
 
 #print axioms nat.of_lt_add_left_irr
 
@@ -73,26 +73,26 @@ theorem nat.of_le_add_left_irr {a b: nat} : x + a <= x + b -> a <= b := by
 
 #print axioms nat.of_le_add_left_irr
 
-theorem nat.to_lt_add_right_irr (a b: nat) : a < b -> x + a < x + b := by
-  rw [nat.add_comm, nat.add_comm]
+theorem nat.to_lt_add_right_irr (a b: nat) : a < b -> a + x < b + x := by
+  rw [nat.add_comm, nat.add_comm b]
   apply nat.to_lt_add_left_irr
 
 #print axioms nat.to_lt_add_right_irr
 
-theorem nat.to_le_add_right_irr (a b: nat) : a <= b -> x + a <= x + b := by
-  rw [nat.add_comm, nat.add_comm]
+theorem nat.to_le_add_right_irr (a b: nat) : a <= b -> a + x <= b + x := by
+  rw [nat.add_comm, nat.add_comm b]
   apply nat.to_le_add_left_irr
 
 #print axioms nat.to_le_add_right_irr
 
-theorem nat.of_lt_add_right_irr (a b: nat) : x + a < x + b -> a < b := by
-  rw [nat.add_comm, nat.add_comm]
+theorem nat.of_lt_add_right_irr {a b: nat} : a + x < b + x -> a < b := by
+  rw [nat.add_comm, nat.add_comm b]
   apply nat.of_lt_add_left_irr
 
 #print axioms nat.of_lt_add_right_irr
 
-theorem nat.of_le_add_right_irr (a b: nat) : x + a <= x + b -> a <= b := by
-  rw [nat.add_comm, nat.add_comm]
+theorem nat.of_le_add_right_irr {a b: nat} : a + x <= b + x -> a <= b := by
+  rw [nat.add_comm, nat.add_comm b]
   apply nat.of_le_add_left_irr
 
 #print axioms nat.of_le_add_right_irr

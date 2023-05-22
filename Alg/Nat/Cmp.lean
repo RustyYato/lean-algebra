@@ -86,7 +86,7 @@ instance nat.zero_le (x: nat) : .zero <= x := match x with | .zero => Or.inr rfl
 
 #print axioms nat.zero_lt_inc
 
-instance nat.gt_zero (a b: nat) : a < b -> nat.zero < b := Compare.le_lt_trans (nat.zero_le a)
+instance nat.gt_zero {a b: nat} : a < b -> nat.zero < b := Compare.le_lt_trans (nat.zero_le a)
 
 #print axioms nat.zero_lt_inc
 
@@ -213,7 +213,7 @@ instance nat.not_lt_zero (x : nat) : ¬x < nat.zero := by
 
 #print axioms nat.not_lt_zero
 
-instance nat.le_to_lt_inc (a b : nat) :   a <= b -> a < nat.inc b := by
+instance nat.le_to_lt_inc {a b : nat} :   a <= b -> a < nat.inc b := by
   intro a_le_b
   cases a 
   exact nat.zero_lt_inc _
@@ -225,12 +225,12 @@ instance nat.le_to_lt_inc (a b : nat) :   a <= b -> a < nat.inc b := by
 
 #print axioms nat.le_to_lt_inc
 
-instance nat.lt_inc_to_le (a b : nat) : a < nat.inc b -> a <= b := by
+instance nat.lt_inc_to_le {a b : nat} : a < nat.inc b -> a <= b := by
   intro a_le_b
   cases a
   exact nat.zero_le _
   have a_le_b := nat.of_lt_inc_irr a_le_b
-  have := nat.gt_zero _ _ a_le_b
+  have := nat.gt_zero a_le_b
   match b with
   | .inc b₀ =>
   apply nat.to_le_inc_irr
@@ -238,3 +238,10 @@ instance nat.lt_inc_to_le (a b : nat) : a < nat.inc b -> a <= b := by
   assumption
   
 #print axioms nat.lt_inc_to_le
+
+def nat.ne_zero_to_gt_zero {a:nat} : a ≠ .zero -> nat.zero < a := fun h => by
+  match a with
+  | .inc _ =>
+  apply nat.zero_lt_inc
+
+#print axioms nat.ne_zero_to_gt_zero
