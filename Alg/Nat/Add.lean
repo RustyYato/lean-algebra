@@ -7,15 +7,15 @@ def nat.add (a b: nat) : nat := match a with
 
 #print axioms nat.add
 
-def nat.add_zero_left : nat.add .zero a = a := rfl
+def nat.add_zero_left : a = .zero -> nat.add a b = b := fun _ => match a with | .zero => rfl
 
 #print axioms nat.add_zero_left
 
-def nat.add_zero_right : nat.add a .zero = a := match a with
-  | .zero => rfl
+def nat.add_zero_right : b = .zero -> nat.add a b = a := fun b_eq_zero => match a with
+  | .zero => b_eq_zero
   | .inc a₀ => by
     unfold nat.add
-    rw [@nat.add_zero_right a₀]
+    rw [nat.add_zero_right b_eq_zero]
 
 #print axioms nat.add_zero_right
 
@@ -48,7 +48,7 @@ def nat.add_comm : nat.add a b = nat.add b a := by
   | .zero, .zero => rfl
   | .inc a₀, .zero
   | .zero, .inc b₀ =>
-    rw [nat.add_zero_right, nat.add_zero_left]
+    rw [nat.add_zero_right rfl, nat.add_zero_left rfl]
   | .inc a₀, .inc b₀ => 
     rw [nat.add_inc_left, nat.add_inc_right]
     rw [nat.add_inc_left, nat.add_inc_right]
