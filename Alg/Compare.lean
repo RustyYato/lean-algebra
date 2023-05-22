@@ -157,7 +157,7 @@ def Compare.ord_from_eq {{ α: Sort _ }} [Compare α] {{ a b : α }} : a = b -> 
 
 #print axioms Compare.ord_from_eq
 
-def Compare.le_id {{ α: Sort _ }} [Compare α] {{ a: α }} :
+def Compare.le_id {{ α: Sort _ }} [Compare α] (a: α) :
   a <= a := by
   apply Or.inr
   exact Compare.ord_id _

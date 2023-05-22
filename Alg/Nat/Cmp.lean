@@ -245,3 +245,15 @@ def nat.ne_zero_to_gt_zero {a:nat} : a ≠ .zero -> nat.zero < a := fun h => by
   apply nat.zero_lt_inc
 
 #print axioms nat.ne_zero_to_gt_zero
+
+def nat.lt_inc (a:nat) : a < inc a := match a with
+  | .zero => rfl
+  | .inc a₀ => by
+    apply nat.to_lt_inc_irr
+    apply nat.lt_inc
+
+#print axioms nat.lt_inc
+
+def nat.le_inc (a:nat) : a <= inc a := Or.inl (nat.lt_inc a)
+
+#print axioms nat.lt_inc
