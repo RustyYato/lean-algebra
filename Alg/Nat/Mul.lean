@@ -13,23 +13,22 @@ def nat.mul_inc_left : (nat.inc a) * b = b + a * b := rfl
 
 #print axioms nat.mul_inc_left
 
-def nat.mul_zero_left : a = nat.zero -> a * b = nat.zero := fun a_eq_zero => match a with | .zero => a_eq_zero
+def nat.mul_zero_left : nat.zero * b = nat.zero := rfl
 
 #print axioms nat.mul_zero_left
 
-def nat.mul_zero_right : b = nat.zero -> a * b = nat.zero := fun _ => match b with
-  | .zero => match a with
+def nat.mul_zero_right : a * nat.zero = nat.zero := match a with
   | .zero => rfl
   | .inc a₀ => by
-    rw [nat.mul_inc_left, nat.add_zero_left rfl]
-    apply nat.mul_zero_right rfl
+    rw [nat.mul_inc_left, nat.add_zero_left]
+    apply nat.mul_zero_right
 
 #print axioms nat.mul_zero_right
 
 def nat.mul_inc_right : a * (nat.inc b) = a + a * b := by
   match a with
   | .zero =>
-    rw [nat.mul_zero_left rfl, nat.mul_zero_left rfl, nat.add_zero_left rfl]
+    rw [nat.mul_zero_left, nat.mul_zero_left, nat.add_zero_left]
   | .inc a₀ =>
     rw [nat.mul_inc_left, nat.mul_inc_left]
     rw [nat.add_inc_left, nat.add_inc_left]
@@ -40,22 +39,20 @@ def nat.mul_inc_right : a * (nat.inc b) = a + a * b := by
 
 #print axioms nat.mul_inc_right
 
-def nat.mul_one_left : a = nat.zero.inc -> a * b = b := fun _ => match a with
-  | .inc .zero => by
-    rw [nat.mul_inc_left, nat.mul_zero_left rfl, nat.add_zero_right rfl]
+def nat.mul_one_left : nat.zero.inc * b = b := by
+    rw [nat.mul_inc_left, nat.mul_zero_left, nat.add_zero_right]
 
 #print axioms nat.mul_one_left
 
-def nat.mul_one_right : b = nat.zero.inc -> a * b = a := fun _ => match b with
-  | .inc .zero => by
-    rw [nat.mul_inc_right, nat.mul_zero_right rfl, nat.add_zero_right rfl]
+def nat.mul_one_right : a * nat.zero.inc = a := by
+    rw [nat.mul_inc_right, nat.mul_zero_right, nat.add_zero_right]
 
 #print axioms nat.mul_one_right
 
 def nat.mul_id_left : a * b = b -> b ≠ .zero -> a = nat.zero.inc := fun muldef b_ne_zero => match a with
   | .inc .zero => rfl
   | .zero => (b_ne_zero (by
-    rw [nat.mul_zero_left rfl] at muldef
+    rw [nat.mul_zero_left] at muldef
     exact muldef.symm
     )).elim
   | .inc (.inc a₀) => by
@@ -71,7 +68,7 @@ def nat.mul_id_left : a * b = b -> b ≠ .zero -> a = nat.zero.inc := fun muldef
 def nat.mul_id_right : a * b = a -> a ≠ .zero -> b = nat.zero.inc := fun muldef a_ne_zero => match b with
   | .inc .zero => rfl
   | .zero => (a_ne_zero (by
-    rw [nat.mul_zero_right rfl] at muldef
+    rw [nat.mul_zero_right] at muldef
     exact muldef.symm
   )).elim
   | .inc (.inc b₀) => by
@@ -100,14 +97,14 @@ def nat.of_mul_irr { a b c: nat } : a * c = b * c -> c ≠ .zero -> a = b := fun
       exact nat.of_mul_irr (nat.add_irr muldef) c_ne_zero
     | .inc _, .zero
     | .zero, .inc _ =>
-      rw [nat.mul_zero_left rfl, nat.mul_inc_left, nat.add_inc_left] at muldef
+      rw [nat.mul_zero_left, nat.mul_inc_left, nat.add_inc_left] at muldef
       contradiction
     
 #print axioms nat.of_mul_irr
 
 def nat.mul_comm (a b: nat) : a * b = b * a := by
   cases a
-  rw [nat.mul_zero_left rfl, nat.mul_zero_right rfl]
+  rw [nat.mul_zero_left, nat.mul_zero_right]
   rw [nat.mul_inc_left, nat.mul_inc_right]
   apply nat.add_eq_add rfl
   apply nat.mul_comm
@@ -116,8 +113,8 @@ def nat.mul_comm (a b: nat) : a * b = b * a := by
 
 def nat.mul_add_left { a b c: nat } : a * (b + c) = a * b + a * c := by
   cases a
-  repeat rw [nat.mul_zero_left rfl]
-  rw [nat.add_zero_left rfl]
+  repeat rw [nat.mul_zero_left]
+  rw [nat.add_zero_left]
   repeat rw [nat.mul_inc_left]
   rw [@nat.add_perm_ab_c_to_a_bc]
   rw [@nat.add_perm_ab_c_to_a_bc]
@@ -137,7 +134,7 @@ def nat.mul_add_right { a b c: nat } : (a + b) * c = a * c + b * c := by
 
 def nat.mul_assoc (a b c: nat) : a * (b * c) = (a * b) * c := by
   cases a
-  repeat rw [nat.mul_zero_left rfl]
+  repeat rw [nat.mul_zero_left]
   repeat rw [nat.mul_inc_left]
   rw [nat.mul_add_right]
   apply nat.add_eq_add rfl

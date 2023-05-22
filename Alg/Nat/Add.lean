@@ -24,13 +24,13 @@ def nat.add_inc_right : a + (nat.inc b) = nat.inc (a + b) := by
 
 #print axioms nat.add_inc_right
 
-def nat.add_zero_left : a = nat.zero -> a + b = b := fun _ => match a with | .zero => rfl
+def nat.add_zero_left : nat.zero + b = b := rfl
 
 #print axioms nat.add_zero_left
 
-def nat.add_zero_right : b = nat.zero -> a + b = a := fun b_eq_zero => match a with
-  | .zero => b_eq_zero
-  | .inc a₀ => by rw [nat.add_inc_left, nat.add_zero_right b_eq_zero]
+def nat.add_zero_right : a + nat.zero = a :=match a with
+  | .zero => rfl
+  | .inc a₀ => by rw [nat.add_inc_left, nat.add_zero_right]
 
 #print axioms nat.add_zero_right
 
@@ -50,7 +50,7 @@ def nat.add_comm (a b: nat) : a + b = b + a := by
   | .zero, .zero => rfl
   | .inc a₀, .zero
   | .zero, .inc b₀ =>
-    rw [nat.add_zero_right rfl, nat.add_zero_left rfl]
+    rw [nat.add_zero_right, nat.add_zero_left]
   | .inc a₀, .inc b₀ => 
     rw [nat.add_inc_left, nat.add_inc_right]
     rw [nat.add_inc_left, nat.add_inc_right]
@@ -76,7 +76,7 @@ def nat.add_id_left { a b: nat } : a + b = b -> a = nat.zero := by
   match a with
   | .zero => rfl
   | .inc _ => match b with
-     | .zero => rw [nat.add_zero_right rfl] at ab_eq_b; contradiction
+     | .zero => rw [nat.add_zero_right] at ab_eq_b; contradiction
      | .inc b₀ =>
       rw [nat.add_inc_right] at ab_eq_b
       have ab_eq_b := nat.of_inc_irr ab_eq_b
@@ -93,7 +93,7 @@ def nat.add_id_right { a b: nat } : a + b = a -> b = .zero := by
 theorem nat.add_assoc (a b c: nat) : a + (b + c) = (a + b) + c := by
   match a with
   | nat.zero =>
-    rw [nat.add_zero_left rfl, nat.add_zero_left rfl]
+    rw [nat.add_zero_left, nat.add_zero_left]
   | nat.inc a₀ => 
       repeat rw [nat.add_inc_left]
       rw [nat.add_assoc a₀]
