@@ -135,7 +135,7 @@ def nat.mul_comm (a b: nat) : a * b = b * a := by
   rw [nat.mul_inc_left, nat.mul_inc_right]
   apply nat.add_eq_add rfl
   apply nat.mul_comm
-    
+
 #print axioms nat.mul_comm
 
 def nat.mul_add_left { a b c: nat } : a * (b + c) = a * b + a * c := by
