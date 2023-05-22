@@ -104,3 +104,12 @@ def nat.of_mul_irr { a b c: nat } : a * c = b * c -> c ≠ .zero -> a = b := fun
       contradiction
     
 #print axioms nat.of_mul_irr
+
+def nat.mul_comm { a b: nat } : a * b = b * a := by
+  cases a
+  rw [nat.mul_zero_left rfl, nat.mul_zero_right rfl]
+  rw [nat.mul_inc_left, nat.mul_inc_right]
+  apply nat.add_eq_add rfl
+  apply nat.mul_comm
+    
+#print axioms nat.mul_comm
