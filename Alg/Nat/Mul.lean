@@ -105,7 +105,7 @@ def nat.of_mul_irr { a b c: nat } : a * c = b * c -> c ≠ .zero -> a = b := fun
     
 #print axioms nat.of_mul_irr
 
-def nat.mul_comm { a b: nat } : a * b = b * a := by
+def nat.mul_comm (a b: nat) : a * b = b * a := by
   cases a
   rw [nat.mul_zero_left rfl, nat.mul_zero_right rfl]
   rw [nat.mul_inc_left, nat.mul_inc_right]
@@ -113,3 +113,60 @@ def nat.mul_comm { a b: nat } : a * b = b * a := by
   apply nat.mul_comm
     
 #print axioms nat.mul_comm
+
+def nat.mul_add_left { a b c: nat } : a * (b + c) = a * b + a * c := by
+  cases a
+  repeat rw [nat.mul_zero_left rfl]
+  rw [nat.add_zero_left rfl]
+  repeat rw [nat.mul_inc_left]
+  rw [@nat.add_perm_ab_c_to_a_bc]
+  rw [@nat.add_perm_ab_c_to_a_bc]
+  apply nat.add_eq_add rfl
+  rw [@nat.add_perm_a_bc_to_b_ac]
+  apply nat.add_eq_add rfl
+  apply nat.mul_add_left
+
+#print axioms nat.mul_add_left
+
+def nat.mul_add_right { a b c: nat } : (a + b) * c = a * c + b * c := by
+  rw [nat.mul_comm]
+  rw [nat.mul_add_left]
+  rw [nat.mul_comm c, nat.mul_comm c]
+
+#print axioms nat.mul_add_right
+
+def nat.mul_assoc (a b c: nat) : a * (b * c) = (a * b) * c := by
+  cases a
+  repeat rw [nat.mul_zero_left rfl]
+  repeat rw [nat.mul_inc_left]
+  rw [nat.mul_add_right]
+  apply nat.add_eq_add rfl
+  apply nat.mul_assoc
+
+#print axioms nat.mul_assoc
+
+theorem nat.mul_perm_a_bc_to_ab_c { a b c: nat } : a * (b * c) = (a * b) * c := by rw [nat.mul_assoc]
+theorem nat.mul_perm_a_bc_to_ba_c { a b c: nat } : a * (b * c) = (b * a) * c := by rw [nat.mul_assoc, nat.mul_comm a b]
+theorem nat.mul_perm_a_bc_to_ac_b { a b c: nat } : a * (b * c) = (a * c) * b := by rw [nat.mul_comm b, nat.mul_assoc]
+theorem nat.mul_perm_a_bc_to_ca_b { a b c: nat } : a * (b * c) = (c * a) * b := by rw [nat.mul_comm b, nat.mul_assoc, nat.mul_comm a c]
+theorem nat.mul_perm_a_bc_to_bc_a { a b c: nat } : a * (b * c) = (b * c) * a := by rw [nat.mul_comm]
+theorem nat.mul_perm_a_bc_to_cb_a { a b c: nat } : a * (b * c) = (c * b) * a := by rw [nat.mul_comm a, nat.mul_comm b]
+
+theorem nat.mul_perm_a_bc_to_c_ab { a b c: nat } : a * (b * c) = c * (a * b) := by rw [nat.mul_perm_a_bc_to_ca_b, nat.mul_assoc]
+theorem nat.mul_perm_a_bc_to_c_ba { a b c: nat } : a * (b * c) = c * (b * a) := by rw [nat.mul_perm_a_bc_to_cb_a, nat.mul_assoc]
+theorem nat.mul_perm_a_bc_to_b_ac { a b c: nat } : a * (b * c) = b * (a * c) := by rw [nat.mul_perm_a_bc_to_ba_c, nat.mul_assoc]
+theorem nat.mul_perm_a_bc_to_b_ca { a b c: nat } : a * (b * c) = b * (c * a) := by rw [nat.mul_perm_a_bc_to_bc_a, nat.mul_assoc]
+theorem nat.mul_perm_a_bc_to_a_cb { a b c: nat } : a * (b * c) = a * (c * b) := by rw [nat.mul_perm_a_bc_to_ac_b, nat.mul_assoc]
+
+theorem nat.mul_perm_ab_c_to_c_ab { a b c: nat } : (a * b) * c = c * (a * b) := by rw [←nat.mul_perm_a_bc_to_bc_a]
+theorem nat.mul_perm_ab_c_to_c_ba { a b c: nat } : (a * b) * c = c * (b * a) := by rw [←nat.mul_perm_a_bc_to_cb_a]
+theorem nat.mul_perm_ab_c_to_b_ac { a b c: nat } : (a * b) * c = b * (a * c) := by rw [←nat.mul_perm_a_bc_to_ba_c]
+theorem nat.mul_perm_ab_c_to_b_ca { a b c: nat } : (a * b) * c = b * (c * a) := by rw [←nat.mul_perm_a_bc_to_ca_b]
+theorem nat.mul_perm_ab_c_to_a_bc { a b c: nat } : (a * b) * c = a * (b * c) := by rw [←nat.mul_perm_a_bc_to_ab_c]
+theorem nat.mul_perm_ab_c_to_a_cb { a b c: nat } : (a * b) * c = a * (c * b) := by rw [←nat.mul_perm_a_bc_to_ac_b]
+
+theorem nat.mul_perm_ab_c_to_ba_c { a b c: nat } : (a * b) * c = (b * a) * c := by rw [nat.mul_perm_ab_c_to_a_bc, nat.mul_perm_a_bc_to_ba_c]
+theorem nat.mul_perm_ab_c_to_ac_b { a b c: nat } : (a * b) * c = (a * c) * b := by rw [nat.mul_perm_ab_c_to_a_bc, nat.mul_perm_a_bc_to_ac_b]
+theorem nat.mul_perm_ab_c_to_ca_b { a b c: nat } : (a * b) * c = (c * a) * b := by rw [nat.mul_perm_ab_c_to_a_bc, nat.mul_perm_a_bc_to_ca_b]
+theorem nat.mul_perm_ab_c_to_bc_a { a b c: nat } : (a * b) * c = (b * c) * a := by rw [nat.mul_perm_ab_c_to_a_bc, nat.mul_perm_a_bc_to_bc_a]
+theorem nat.mul_perm_ab_c_to_cb_a { a b c: nat } : (a * b) * c = (c * b) * a := by rw [nat.mul_perm_ab_c_to_a_bc, nat.mul_perm_a_bc_to_cb_a]
