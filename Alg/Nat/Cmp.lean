@@ -77,3 +77,164 @@ instance nat.cmp : Compare nat where
   ord_transitive := nat.ord_transitive
 
 #print axioms nat.cmp
+
+instance nat.zero_lt_inc (x: nat) : .zero < inc x := rfl
+
+#print axioms nat.zero_lt_inc
+
+instance nat.zero_le (x: nat) : .zero <= x := match x with | .zero => Or.inr rfl | .inc _ => Or.inl rfl
+
+#print axioms nat.zero_lt_inc
+
+instance nat.gt_zero (a b: nat) : a < b -> nat.zero < b := Compare.le_lt_trans (nat.zero_le a)
+
+#print axioms nat.zero_lt_inc
+
+instance nat.ord_inc_irr (a b: nat) : ord (inc a) (inc b) = ord a b := by
+  conv => {
+    lhs
+    unfold Compare.ord nat.cmp nat.ord
+  }
+
+#print axioms nat.ord_inc_irr
+
+instance nat.to_lt_inc_irr (a b: nat) : a < b -> inc a < inc b := by
+  intro a_lt_b
+  unfold LT.lt ord_lt nat.cmp nat.ord
+  simp
+  rw [nat.ord_inc_irr a b]
+  exact a_lt_b
+
+#print axioms nat.to_lt_inc_irr
+
+instance nat.to_le_inc_irr (a b: nat) : a <= b -> inc a <= inc b := by
+  intro a_le_b
+  match a_le_b with
+  | .inl a_lt_b =>
+    apply Or.inl
+    unfold Compare.ord nat.cmp nat.ord; simp
+    assumption
+  | .inr a_eq_b =>
+    apply Or.inr
+    unfold Compare.ord nat.cmp nat.ord; simp
+    assumption
+
+#print axioms nat.to_le_inc_irr
+
+instance nat.to_gt_inc_irr (a b: nat) : a > b -> inc a > inc b := by
+  intro a_lt_b
+  unfold GT.gt LT.lt ord_lt nat.cmp nat.ord
+  simp
+  exact a_lt_b
+
+#print axioms nat.to_gt_inc_irr
+
+instance nat.to_ge_inc_irr (a b: nat) : a >= b -> inc a >= inc b := by
+  intro a_le_b
+  match a_le_b with
+  | .inl a_lt_b =>
+    apply Or.inl
+    unfold Compare.ord nat.cmp nat.ord; simp
+    assumption
+  | .inr a_eq_b =>
+    apply Or.inr
+    unfold Compare.ord nat.cmp nat.ord; simp
+    assumption
+
+#print axioms nat.to_ge_inc_irr
+
+instance nat.of_lt_inc_irr {a b: nat} : inc a < inc b -> a < b := by
+  intro a_lt_b
+  unfold LT.lt ord_lt nat.cmp nat.ord at a_lt_b
+  simp at a_lt_b
+  rw [nat.ord_inc_irr a b] at a_lt_b
+  exact a_lt_b
+
+#print axioms nat.of_lt_inc_irr
+
+instance nat.of_le_inc_irr {a b: nat} : inc a <= inc b -> a <= b := by
+  intro a_le_b
+  match a_le_b with
+  | .inl a_lt_b =>
+    apply Or.inl
+    unfold Compare.ord nat.cmp nat.ord at a_lt_b
+    assumption
+  | .inr a_eq_b =>
+    apply Or.inr
+    unfold Compare.ord nat.cmp nat.ord at a_eq_b
+    assumption
+
+#print axioms nat.of_le_inc_irr
+
+instance nat.of_gt_inc_irr {a b: nat} : inc a > inc b -> a > b := by
+  intro a_lt_b
+  unfold GT.gt LT.lt ord_lt nat.cmp nat.ord
+  simp
+  exact a_lt_b
+
+#print axioms nat.of_gt_inc_irr
+
+instance nat.of_ge_inc_irr {a b: nat} : inc a >= inc b -> a >= b := by
+  intro a_le_b
+  match a_le_b with
+  | .inl a_lt_b =>
+    apply Or.inl
+    unfold Compare.ord nat.cmp nat.ord at a_lt_b
+    assumption
+  | .inr a_eq_b =>
+    apply Or.inr
+    unfold Compare.ord nat.cmp nat.ord at a_eq_b
+    assumption
+
+#print axioms nat.of_ge_inc_irr
+
+instance nat.not_inc_le_zero (x : nat) : ¬nat.inc x <= nat.zero := by
+  intro inc_le_zero
+  cases inc_le_zero <;> contradiction
+
+#print axioms nat.not_inc_le_zero
+
+instance nat.le_zero : x <= nat.zero -> x = nat.zero := by
+  intro x_le_zero
+  match x with
+  | .zero => rfl
+  | .inc x =>
+    have := nat.not_inc_le_zero x
+    contradiction
+
+#print axioms nat.le_zero
+
+instance nat.not_lt_zero (x : nat) : ¬x < nat.zero := by
+  intro x_lt_zero
+  unfold LT.lt ord_lt Compare.ord nat.cmp nat.ord at x_lt_zero
+  simp at x_lt_zero
+  unfold nat.ord at x_lt_zero
+  cases x <;> contradiction
+
+#print axioms nat.not_lt_zero
+
+instance nat.le_to_lt_inc (a b : nat) :   a <= b -> a < nat.inc b := by
+  intro a_le_b
+  cases a 
+  exact nat.zero_lt_inc _
+  apply nat.to_lt_inc_irr
+  match b with
+  | .inc b₀ =>
+  apply nat.le_to_lt_inc
+  assumption
+
+#print axioms nat.le_to_lt_inc
+
+instance nat.lt_inc_to_le (a b : nat) : a < nat.inc b -> a <= b := by
+  intro a_le_b
+  cases a
+  exact nat.zero_le _
+  have a_le_b := nat.of_lt_inc_irr a_le_b
+  have := nat.gt_zero _ _ a_le_b
+  match b with
+  | .inc b₀ =>
+  apply nat.to_le_inc_irr
+  apply nat.lt_inc_to_le
+  assumption
+  
+#print axioms nat.lt_inc_to_le
