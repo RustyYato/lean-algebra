@@ -337,3 +337,44 @@ theorem nat.div_def : ∀a b: nat, b ≠ .zero -> a = (a / b) * b + (a % b) := b
     rw [nat.add_sub_inv]
     assumption
   }
+
+#print axioms nat.div_def
+
+theorem nat.from_div_def : ∀a b: nat, b ≠ .zero -> ∀ q r, r < b -> a = b * q + r -> q = a / b ∧ r = a % b := by
+  apply divrem.induction
+  {
+    intro a b _ a_lt_b
+    intro q r _ divdef
+    rw [nat.div_base a_lt_b, nat.rem_base a_lt_b]
+    cases q
+    apply And.intro
+    rfl
+    rw [nat.mul_zero_right, nat.add_zero_left] at divdef
+    exact divdef.symm
+    rw [nat.mul_inc_right, nat.add_perm_ab_c_to_a_bc] at divdef
+    rw [divdef] at a_lt_b
+    have := Compare.le_lt_trans (nat.a_le_a_add_b _ _) a_lt_b
+    have := Compare.not_lt_id this
+    contradiction
+  }
+  {
+    intro a b b_nz b_le_a prev
+    intro q r r_lt_b divdef
+    rw [nat.div_induct b_nz b_le_a, nat.rem_induct b_nz b_le_a]
+    match q with
+    | .zero =>
+      rw [nat.mul_zero_right, nat.add_zero_left] at divdef
+      rw [←divdef] at r_lt_b
+      have := Compare.not_lt_and_le _ _ r_lt_b b_le_a
+      contradiction
+    | .inc q₀ =>
+    have ⟨ qdef, rdef ⟩  := prev q₀ r r_lt_b (by
+      rw [divdef]
+      rw [nat.mul_inc_right]
+      rw [nat.add_perm_ab_c_to_a_bc, nat.sub_add_inv])
+    apply And.intro
+    exact nat.to_inc_irr qdef
+    exact rdef
+  }
+
+#print axioms nat.from_div_def
