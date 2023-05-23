@@ -1,5 +1,6 @@
 import Alg.Nat.Sub
-import Alg.Nat.Mul
+import Alg.Nat.Mul.Cmp
+import Alg.Nat.Mul.Sub
 
 structure divrem where
   quot: nat
@@ -272,3 +273,49 @@ theorem nat.rem_le: ∀(a b: nat), b ≠ zero -> a % b <= a  := by
   }
 
 #print axioms nat.rem_lt
+
+axiom Test : False
+
+theorem nat.of_mul_rem: ∀(a b: nat), b ≠ zero -> f * (a % b) = (f * a) % (f * b)  := by
+  apply divrem.induction
+
+  {
+    intro a b b_nz a_lt_b
+    match f with
+    | .zero =>
+      rw [nat.mul_zero_left, nat.mul_zero_left, nat.mul_zero_left]
+      rfl
+    | .inc f =>
+    rw [nat.remainder.base, nat.remainder.base]
+    apply nat.to_lt_mul_left_irr
+    any_goals assumption
+    exact nat.noConfusion
+    match b with
+    | .inc b =>
+    rw [nat.mul_inc_left, nat.add_inc_left]
+    exact nat.noConfusion
+  }
+
+  {
+    intro a b b_nz a_ge_b prev
+    match f with
+    | .zero =>
+      rw [nat.mul_zero_left, nat.mul_zero_left, nat.mul_zero_left]
+      rfl
+    | .inc f =>
+      rw [nat.remainder.induct]
+      conv => {
+        rhs
+        rw [nat.remainder.induct (by
+          apply nat.to_le_mul_left_irr
+          assumption) (by
+          match b with
+          | .inc b =>
+          rw [nat.mul_inc_left, nat.add_inc_left]
+          exact nat.noConfusion)]
+        rw [←nat.mul_sub_left _ _ _  (by assumption)]
+      }
+      repeat assumption
+  }
+
+#print axioms nat.of_mul_rem

@@ -268,3 +268,48 @@ theorem dvd.gcd_right {a b: nat} (d: b ∣ a) : gcd a b = b := by
   exact this
 
 #print axioms dvd.gcd_right
+
+theorem gcd.of_mul_dvd : ∀ {a b x: nat}, x ∣ (f * a) -> x ∣ (f * b) -> x ∣ (f * gcd a b) := by
+  apply gcd.induction
+  {
+    intro b
+    intro x _ dvd_b
+    rw [gcd.zero_left]
+    exact dvd_b
+  }
+  {
+    intro a b a_nz prev
+    intro x dvd_a dvd_b
+    match f with
+    | .zero =>
+      rw [nat.mul_zero_left] at dvd_a
+      rw [nat.mul_zero_left]
+      assumption
+    | .inc f =>
+    rw [gcd.induct a_nz]
+    apply prev _ dvd_a
+    rw [nat.of_mul_rem]
+    apply dvd.of_rem
+    match a with
+      | .inc a =>
+        rw [nat.mul_inc_left, nat.add_inc_left]
+        exact nat.noConfusion
+    repeat assumption
+  }
+
+#print axioms gcd.of_mul_dvd
+
+theorem gcd.mul_left : gcd (x * a) (x * b) = x * gcd a b := by
+  apply dvd.to_eq
+  {
+    apply gcd.of_mul_dvd
+    exact (gcd.is_dvd _ _).left
+    exact (gcd.is_dvd _ _).right
+  }
+  {
+    apply gcd.of_dvd
+    apply dvd.to_mul_com_left
+    exact (gcd.is_dvd a b).left
+    apply dvd.to_mul_com_left
+    exact (gcd.is_dvd a b).right
+  }
