@@ -75,6 +75,16 @@ def divrem.calc (a b: nat) (h: b ≠ .zero): divrem :=
 
 #print axioms divrem.calc
 
+def divrem.calc.of_bounded (a b: nat) (h: b ≠ .zero) :
+  ∀ x xh,
+  divrem.induction.bounded x
+      (fun a _ _ _ => divrem.mk nat.zero a)
+      (fun _ _ _ _ prev => divrem.mk prev.quot.inc prev.rem)
+      a b h xh = divrem.calc a b h := by
+  intro x xh
+  unfold divrem.calc
+  rw [divrem.induction.bounded.counter_irr]
+
 def nat.divide (a b: nat) (b_nz: b ≠ .zero) := (divrem.calc a b b_nz).quot
 def nat.remainder (a b: nat) (b_nz: b ≠ .zero) := (divrem.calc a b b_nz).rem
 
@@ -88,43 +98,98 @@ instance nat.Rem : Mod nat where
     | .zero => .zero
     | .inc y₀ => nat.remainder x y₀.inc nat.noConfusion
 
+def nat.divide.of_calc (a b: nat) (h: b ≠ .zero) :
+  (divrem.calc a b h).quot = a / b := by
+  match b with
+  | .inc _ =>
+  rfl
+
+def nat.remainder.of_calc (a b: nat) (h: b ≠ .zero) :
+  (divrem.calc a b h).rem = a % b := by
+  match b with
+  | .inc _ =>
+  rfl
+
+theorem nat.divide.base { a b : nat } (a_lt_b: a < b) (b_nz: b ≠ .zero) : a / b = .zero := by
+  conv => {
+    lhs
+    unfold HDiv.hDiv instHDiv Div.div nat.Div nat.divide
+  }
+  match b with
+  | .inc b =>
+  simp
+  unfold divrem.calc divrem.induction.bounded
+  split
+  rfl
+  have := (Compare.not_lt_and_le _ _ a_lt_b)
+  contradiction
+
+#print axioms nat.divide.base
+
+theorem nat.remainder.base { a b : nat } (a_lt_b: a < b) (b_nz: b ≠ .zero) : a % b = a := by
+  conv => {
+    lhs
+    unfold HMod.hMod instHMod Mod.mod nat.Rem nat.remainder
+  }
+  match b with
+  | .inc b =>
+  simp
+  unfold divrem.calc divrem.induction.bounded
+  split
+  rfl
+  have := (Compare.not_lt_and_le _ _ a_lt_b)
+  contradiction
+
+#print axioms nat.remainder.base
+
+theorem nat.divide.induct { a b : nat } (b_le_a: b <= a) (b_nz: b ≠ .zero) : a / b = ((a - b) / b).inc := by
+  conv => {
+    lhs
+    unfold HDiv.hDiv instHDiv Div.div nat.Div nat.divide
+  }
+  match b with
+  | .inc b =>
+  simp
+  unfold divrem.calc divrem.induction.bounded
+  split
+  have := (Compare.not_lt_and_le _ _ · b_le_a)
+  contradiction
+  rw [divrem.calc.of_bounded, nat.divide.of_calc]
+
+#print axioms nat.divide.induct
+
+theorem nat.remainder.induct { a b : nat } (b_le_a: b <= a) (b_nz: b ≠ .zero) : a % b = (a - b) % b := by
+  conv => {
+    lhs
+    unfold HMod.hMod instHMod Mod.mod nat.Rem nat.remainder
+  }
+  match b with
+  | .inc b =>
+  simp
+  unfold divrem.calc divrem.induction.bounded
+  split
+  have := (Compare.not_lt_and_le _ _ · b_le_a)
+  contradiction
+  simp
+  rw [divrem.calc.of_bounded, nat.remainder.of_calc]
+
+#print axioms nat.remainder.induct
+
 theorem nat.div_def : ∀a b: nat, b ≠ .zero -> a = (a / b) * b + (a % b) := by
   apply divrem.induction
   {
     intro a b b_nz a_lt_b
-    unfold HDiv.hDiv instHDiv Div.div nat.Div nat.divide
-    unfold HMod.hMod instHMod Mod.mod nat.Rem nat.remainder divrem.calc
-    match b with
-    | .inc b =>
-    simp
-    unfold divrem.induction.bounded
-    simp
-    split
-    simp
+    rw [nat.divide.base, nat.remainder.base]
     rw [nat.mul_zero_left, nat.add_zero_left]
-    contradiction
+    repeat assumption
   }
   {
     intro a b b_nz b_le_a prev
-    unfold HDiv.hDiv instHDiv Div.div nat.Div nat.divide
-    unfold HMod.hMod instHMod Mod.mod nat.Rem nat.remainder divrem.calc
-    unfold HDiv.hDiv instHDiv Div.div nat.Div nat.divide at prev
-    unfold HMod.hMod instHMod Mod.mod nat.Rem nat.remainder divrem.calc at prev
-    match b with
-    | .inc b =>
-    simp
-    unfold divrem.induction.bounded
-    simp
-    split
-    have := (Compare.not_lt_and_le _ _ · b_le_a)
-    contradiction
-    simp
-    simp at prev
+    rw [nat.divide.induct, nat.remainder.induct]
     rw [nat.mul_inc_left, nat.add_perm_ab_c_to_a_bc]
-    rw [divrem.induction.bounded.counter_irr]
     rw [←prev]
     rw [nat.add_sub_inv]
-    assumption
+    repeat assumption
   }
 
 #print axioms nat.div_def
@@ -134,15 +199,7 @@ theorem nat.from_div_def : ∀a b: nat, b ≠ .zero -> ∀ q r, r < b -> a = b *
   {
     intro a b _ a_lt_b
     intro q r _ divdef
-    have := nat.gt_zero a_lt_b
-    match b with
-    | .inc b => 
-    unfold HDiv.hDiv instHDiv Div.div nat.Div nat.divide
-    unfold HMod.hMod instHMod Mod.mod nat.Rem nat.remainder divrem.calc
-    simp
-    unfold divrem.induction.bounded
-    split
-    simp
+    rw [nat.divide.base, nat.remainder.base]
     cases q
     apply And.intro
     rfl
@@ -153,21 +210,11 @@ theorem nat.from_div_def : ∀a b: nat, b ≠ .zero -> ∀ q r, r < b -> a = b *
     have := Compare.le_lt_trans (nat.a_le_a_add_b _ _) a_lt_b
     have := Compare.not_lt_id this
     contradiction
-    contradiction
+    repeat assumption
   }
   {
     intro a b b_nz b_le_a prev
     intro q r r_lt_b divdef
-    match b with
-    | .inc b => 
-    unfold HDiv.hDiv instHDiv Div.div nat.Div nat.divide
-    unfold HMod.hMod instHMod Mod.mod nat.Rem nat.remainder divrem.calc
-    simp
-    unfold divrem.induction.bounded
-    split
-    have := (Compare.not_lt_and_le _ _ · b_le_a)
-    contradiction
-    simp
     match q with
     | .zero =>
       rw [nat.mul_zero_right, nat.add_zero_left] at divdef
@@ -175,18 +222,16 @@ theorem nat.from_div_def : ∀a b: nat, b ≠ .zero -> ∀ q r, r < b -> a = b *
       have := Compare.not_lt_and_le _ _ r_lt_b b_le_a
       contradiction
     | .inc q₀ =>
-    have ⟨ qdef, rdef ⟩  := prev q₀ r r_lt_b (by
-      rw [divdef]
-      rw [nat.mul_inc_right]
-      rw [nat.add_perm_ab_c_to_a_bc, nat.sub_add_inv])
-    
-    unfold HDiv.hDiv instHDiv Div.div nat.Div nat.divide divrem.calc at qdef
-    unfold HMod.hMod instHMod Mod.mod nat.Rem nat.remainder divrem.calc at rdef
-    simp at qdef rdef
-    rw [divrem.induction.bounded.counter_irr]
-    apply And.intro
-    rw [qdef]
-    rw [rdef]
+      have ⟨ qdef, rdef ⟩  := prev q₀ r r_lt_b (by
+        rw [divdef]
+        rw [nat.mul_inc_right]
+        rw [nat.add_perm_ab_c_to_a_bc, nat.sub_add_inv])
+      apply And.intro
+      rw [nat.divide.induct, qdef]
+      repeat assumption
+      rw [nat.remainder.induct, rdef]
+      repeat assumption
+    repeat assumption  
   }
 
 #print axioms nat.from_div_def
@@ -196,36 +241,14 @@ theorem nat.rem_lt : ∀(a b: nat), b ≠ zero -> a % b < b  := by
 
   {
     intro a b b_nz a_lt_b
-    unfold HMod.hMod instHMod Mod.mod nat.Rem nat.remainder divrem.calc
-    simp
-    split
-    contradiction
-    unfold divrem.induction.bounded
-    split
-    simp
-    assumption
-    contradiction
+    rw [nat.remainder.base]
+    repeat assumption
   }
 
   {
-    intro a b b_nz a_ge_b prev
-    unfold HMod.hMod instHMod Mod.mod nat.Rem nat.remainder divrem.calc
-    unfold HMod.hMod instHMod Mod.mod nat.Rem nat.remainder divrem.calc at prev
-    simp
-    simp at prev
-    match b with
-    | .inc b =>
-    simp
-    unfold divrem.induction.bounded
-    split
-    next h _ => {
-      have := Compare.not_lt_and_le _ _ h
-      contradiction
-    }
-    simp at prev
-    simp
-    rw [divrem.induction.bounded.counter_irr]
-    assumption
+    intro a b b_nz b_le_a prev
+    rw [nat.remainder.induct b_le_a]
+    repeat assumption
   }
 
 #print axioms nat.rem_lt
@@ -235,37 +258,17 @@ theorem nat.rem_le: ∀(a b: nat), b ≠ zero -> a % b <= a  := by
 
   {
     intro a b b_nz a_lt_b
-    unfold HMod.hMod instHMod Mod.mod nat.Rem nat.remainder divrem.calc
-    simp
-    split
-    contradiction
-    unfold divrem.induction.bounded
-    split
-    simp
+    rw [nat.remainder.base]
     apply Compare.le_id
-    contradiction
+    repeat assumption
   }
 
   {
     intro a b b_nz a_ge_b prev
-    unfold HMod.hMod instHMod Mod.mod nat.Rem nat.remainder divrem.calc
-    unfold HMod.hMod instHMod Mod.mod nat.Rem nat.remainder divrem.calc at prev
-    simp
-    simp at prev
-    match b with
-    | .inc b =>
-    simp
-    unfold divrem.induction.bounded
-    split
-    next h _ => {
-      have := Compare.not_lt_and_le _ _ h
-      contradiction
-    }
-    simp at prev
-    simp
-    rw [divrem.induction.bounded.counter_irr]
+    rw [nat.remainder.induct]
     apply Compare.le_trans prev
     apply nat.sub_is_le
+    repeat assumption
   }
 
 #print axioms nat.rem_lt
