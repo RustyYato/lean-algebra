@@ -3,33 +3,33 @@ import Alg.Nat.Mul.Sub
 
 def dvd (a b: nat) := ∃x, b = a * x
 
-infixl:30 " | " => dvd
+infixl:30 " ∣ " => dvd
 
-theorem dvd.zero (a: nat) : a | nat.zero := ⟨ nat.zero , nat.mul_zero_right.symm ⟩
-
-#print axioms dvd.zero
-
-theorem dvd.by_zero (a: nat) : nat.zero | a -> a = .zero := fun ⟨ _, prf ⟩ => prf
+theorem dvd.zero (a: nat) : a ∣ nat.zero := ⟨ nat.zero , nat.mul_zero_right.symm ⟩
 
 #print axioms dvd.zero
 
-theorem dvd.one (a: nat) : nat.zero.inc | a := ⟨ a , nat.mul_one_left.symm ⟩
+theorem dvd.by_zero (a: nat) : nat.zero ∣ a -> a = .zero := fun ⟨ _, prf ⟩ => prf
+
+#print axioms dvd.zero
+
+theorem dvd.one (a: nat) : nat.zero.inc ∣ a := ⟨ a , nat.mul_one_left.symm ⟩
 
 #print axioms dvd.one
 
-theorem dvd.id (a: nat) : a | a := ⟨ nat.zero.inc , nat.mul_one_right.symm ⟩
+theorem dvd.id (a: nat) : a ∣ a := ⟨ nat.zero.inc , nat.mul_one_right.symm ⟩
 
 #print axioms dvd.id
 
-theorem dvd.mul_left (a b: nat) : a | a * b := ⟨ b, rfl ⟩
+theorem dvd.mul_left (a b: nat) : a ∣ a * b := ⟨ b, rfl ⟩
 
 #print axioms dvd.mul_left
 
-theorem dvd.mul_right (a b: nat) : b | a * b := ⟨ a, nat.mul_comm a b ⟩
+theorem dvd.mul_right (a b: nat) : b ∣ a * b := ⟨ a, nat.mul_comm a b ⟩
 
 #print axioms dvd.mul_right
 
-theorem dvd.is_le : a | b -> b ≠ .zero -> a <= b  :=
+theorem dvd.is_le : a ∣ b -> b ≠ .zero -> a <= b  :=
   fun ⟨ x, prf ⟩ _ =>
     match b with
     | .inc b₀ => by
@@ -42,7 +42,7 @@ theorem dvd.is_le : a | b -> b ≠ .zero -> a <= b  :=
 
 #print axioms dvd.is_le
 
-theorem dvd.is_nz : a | b -> b ≠ .zero -> a ≠ .zero  :=
+theorem dvd.is_nz : a ∣ b -> b ≠ .zero -> a ≠ .zero :=
   fun ⟨ x, prf ⟩ _ =>
     match b with
     | .inc b₀ => by
@@ -60,11 +60,11 @@ theorem dvd.is_nz : a | b -> b ≠ .zero -> a ≠ .zero  :=
 
 #print axioms dvd.is_nz
 
-theorem dvd.not : ¬ (a | b) -> ∀x, b ≠ a * x  := fun not_divis x prf => not_divis ⟨ x, prf ⟩
+theorem dvd.not : ¬ (a ∣ b) -> ∀x, b ≠ a * x  := fun not_divis x prf => not_divis ⟨ x, prf ⟩
 
 #print axioms dvd.not
 
-theorem dvd.to_eq : a | b -> b | a -> a = b := by 
+theorem dvd.to_eq : a ∣ b -> b ∣ a -> a = b := by 
   intro a_dvd_b b_dvd_a
   have ⟨ x, prfx ⟩ := a_dvd_b
   have ⟨ y, prfy ⟩ := b_dvd_a 
@@ -81,7 +81,7 @@ theorem dvd.to_eq : a | b -> b | a -> a = b := by
 
 #print axioms dvd.to_eq
 
-theorem dvd.trans : a | b -> b | c -> a | c := by 
+theorem dvd.trans : a ∣ b -> b ∣ c -> a ∣ c := by 
   intro a_dvd_b b_dvd_c
   have ⟨ x, prfx ⟩ := a_dvd_b
   have ⟨ y, prfy ⟩ := b_dvd_c
@@ -91,7 +91,7 @@ theorem dvd.trans : a | b -> b | c -> a | c := by
 
 #print axioms dvd.trans
 
-theorem dvd.to_add : x | a -> x | b -> x | (a + b) := by 
+theorem dvd.to_add : x ∣ a -> x ∣ b -> x ∣ (a + b) := by 
   intro ax bx
   have ⟨ a₀, prfa ⟩ := ax
   have ⟨ b₀, prfb ⟩ := bx
@@ -101,7 +101,7 @@ theorem dvd.to_add : x | a -> x | b -> x | (a + b) := by
 
 #print axioms dvd.to_add
 
-theorem dvd.to_mul : x | a -> x | b -> x | (a * b) := by 
+theorem dvd.to_mul : x ∣ a -> x ∣ b -> x ∣ (a * b) := by 
   intro ax bx
   have ⟨ a₀, prfa ⟩ := ax
   have ⟨ b₀, prfb ⟩ := bx
@@ -113,7 +113,7 @@ theorem dvd.to_mul : x | a -> x | b -> x | (a * b) := by
 
 #print axioms dvd.to_mul
 
-theorem dvd.add_cancel_left : x | a -> x | (a + b) -> x | b := by
+theorem dvd.add_cancel_left : x ∣ a -> x ∣ (a + b) -> x ∣ b := by
   intro ax abx
   cases x
   have := abx.by_zero
@@ -137,7 +137,7 @@ theorem dvd.add_cancel_left : x | a -> x | (a + b) -> x | b := by
 
 #print axioms dvd.add_cancel_left
 
-theorem dvd.add_cancel_right : x | b -> x | (a + b) -> x | a := by
+theorem dvd.add_cancel_right : x ∣ b -> x ∣ (a + b) -> x ∣ a := by
   rw [nat.add_comm]
   apply dvd.add_cancel_left
 
