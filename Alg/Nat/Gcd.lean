@@ -314,11 +314,33 @@ theorem nat.gcd.mul_left : gcd (x * a) (x * b) = x * gcd a b := by
     exact (nat.gcd.is_dvd a b).right
   }
 
+theorem nat.gcd.mul_right : gcd (a * x) (b * x) = (gcd a b) * x := by
+  rw [nat.mul_comm a, nat.mul_comm b]
+  rw [nat.gcd.mul_left, nat.mul_comm]
+
+
 #print axioms nat.gcd.mul_left
 
 theorem nat.coprime.gcd (c: nat.coprime a b) : nat.gcd a b = nat.zero.inc := c
+
+#print axioms nat.coprime.gcd
 
 theorem nat.coprime.comm (c: nat.coprime a b) : nat.coprime b a := by
   unfold nat.coprime
   rw [gcd.comm]
   exact c
+
+#print axioms nat.coprime.comm
+
+theorem nat.coprime.cancel_left (c: nat.coprime x a) (d: a ∣ x * b) : a ∣ b := by
+  have g := gcd.of_dvd (dvd.mul_left a b) d
+  rw [gcd.mul_right, nat.gcd.comm, c, nat.mul_one_left] at g
+  assumption
+
+#print axioms nat.coprime.cancel_left
+
+theorem nat.coprime.cancel_right (c: nat.coprime x a) (d: a ∣ b * x) : a ∣ b := by
+  rw [nat.mul_comm] at d
+  apply nat.coprime.cancel_left c d
+
+#print axioms nat.coprime.cancel_right
