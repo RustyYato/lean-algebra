@@ -144,3 +144,40 @@ theorem gcd.le : ∀(a b: nat), gcd a b <= a ∧ gcd a b <= b ∨ a = nat.zero �
   }
 
 #print axioms gcd.le
+
+theorem gcd.of_dvd : ∀ (a b x: nat), x ∣ a -> x ∣ b -> x ∣ gcd a b := by
+  apply gcd.induction
+  {
+    intro b
+    intro x _ dvd_b
+    rw [gcd.zero_left]
+    exact dvd_b
+  }
+  {
+    intro a b a_nz prev
+    intro x dvd_a dvd_b
+    rw [gcd.induct a_nz]
+    exact (prev x · dvd_a) (dvd.of_rem b a a_nz dvd_b dvd_a)
+  }
+
+theorem gcd.to_dvd : ∀ (a b x: nat), x ∣ gcd a b -> x ∣ a ∧ x ∣ b := by
+  apply gcd.induction
+  {
+    intro b
+    intro x dvd_gcd
+    rw [gcd.base] at dvd_gcd
+    apply And.intro
+    exact dvd.zero _
+    assumption
+  }
+  {
+    intro a b a_nz prev
+    intro x dvd_gcd
+    rw [gcd.induct a_nz] at dvd_gcd
+    have ⟨ dvd_rem, dvd_a ⟩  := prev x dvd_gcd
+    apply And.intro
+    assumption
+    exact dvd.rem_cancel_right b a a_nz dvd_a dvd_rem
+  }
+
+#print axioms gcd.to_dvd

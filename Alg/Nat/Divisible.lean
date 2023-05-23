@@ -3,7 +3,7 @@ import Alg.Nat.Mul.Sub
 
 def dvd (a b: nat) := ∃x, b = a * x
 
-infixl:30 " ∣ " => dvd
+infixl:50 " ∣ " => dvd
 
 theorem dvd.zero (a: nat) : a ∣ nat.zero := ⟨ nat.zero , nat.mul_zero_right.symm ⟩
 
@@ -112,6 +112,33 @@ theorem dvd.to_mul : x ∣ a -> x ∣ b -> x ∣ (a * b) := by
   rw [←prfb]
 
 #print axioms dvd.to_mul
+
+theorem dvd.to_sub : x ∣ a -> x ∣ b -> x ∣ (a - b) := by 
+  intro ax bx
+  match x with
+  | .zero =>
+    have a_eq_zero := ax.by_zero
+    rw [a_eq_zero]
+    rw [nat.sub_zero_left]
+    exact dvd.zero _
+  | .inc x =>
+  match Compare.dec_lt b a with
+  | .isTrue _ =>
+    have ⟨ a₀, prfa ⟩ := ax
+    have ⟨ b₀, prfb ⟩ := bx
+    exists a₀ - b₀
+    rw [nat.mul_sub_left]
+    rw [prfa, prfb]
+    apply @nat.of_le_mul_left_irr x.inc nat.noConfusion
+    rw [←prfa, ←prfb]
+    apply Or.inl
+    assumption
+  | .isFalse h =>
+    have h := Compare.not_lt_is_le h
+    rw [nat.sub_le h]
+    exact dvd.zero _
+
+#print axioms dvd.to_sub
 
 theorem dvd.add_cancel_left : x ∣ a -> x ∣ (a + b) -> x ∣ b := by
   intro ax abx

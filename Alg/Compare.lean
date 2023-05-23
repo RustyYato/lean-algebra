@@ -329,6 +329,14 @@ theorem Compare.not_lt_is_le [Compare α] {a b: α} : ¬a < b -> b <= a := fun n
 
 #print axioms Compare.not_lt_is_le
 
+theorem Compare.not_le_is_lt [Compare α] {a b: α} : ¬a <= b -> b < a := fun not_le => 
+  match h:Compare.ord b a with
+  | .Less => h
+  | .Eq => (not_le (Or.inr (Compare.flip h))).elim
+  | .Greater => (not_le (Or.inl (Compare.flip h))).elim
+
+#print axioms Compare.not_lt_is_le
+
 theorem Compare.not_lt_id [Compare α] {a: α} : ¬a < a := by
   intro lt_id
   have := Compare.ord_id a
@@ -336,4 +344,3 @@ theorem Compare.not_lt_id [Compare α] {a: α} : ¬a < a := by
   contradiction
 
 #print axioms Compare.not_lt_id
-

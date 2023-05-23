@@ -54,3 +54,46 @@ instance dvd.dec_auto {a b: nat} : Decidable (nat.inc a ∣ b) :=
   @dvd.dec a.inc b nat.noConfusion
 
 #print axioms dvd.dec_auto
+
+theorem dvd.of_rem : ∀a b (_: b ≠ .zero), ∀{{x}} (_: x ∣ a) (_: x ∣ b), x ∣ (a % b) := by
+  apply divrem.induction
+
+  {
+    intro a b b_nz a_lt_b
+    intro x dvd_a _
+    rw [nat.remainder.base]
+    repeat assumption
+  }
+
+  {
+    intro a b b_nz a_lt_b prev
+    intro x dvd_a dvd_b
+    rw [nat.remainder.induct]
+    have := prev (dvd.to_sub dvd_a dvd_b) dvd_b
+    repeat assumption
+  }
+
+#print axioms dvd.of_rem
+
+theorem dvd.rem_cancel_right : ∀a b (_: b ≠ .zero), ∀{{x}} (_: x ∣ b) (_: x ∣ a % b), x ∣ a := by
+  apply divrem.induction
+
+  {
+    intro a b b_nz a_lt_b
+    intro x _ dvd_rem
+    rw [nat.remainder.base] at dvd_rem
+    exact dvd_rem
+    repeat assumption
+  }
+
+  {
+    intro a b b_nz a_lt_b prev
+    intro x dvd_a dvd_rem
+    rw [nat.remainder.induct] at dvd_rem
+    have := prev dvd_a dvd_rem
+    have := dvd.to_add this dvd_a
+    rw [nat.add_comm, nat.add_sub_inv] at this
+    repeat assumption
+  }
+
+#print axioms dvd.rem_cancel_right
