@@ -190,3 +190,82 @@ theorem nat.from_div_def : ∀a b: nat, b ≠ .zero -> ∀ q r, r < b -> a = b *
   }
 
 #print axioms nat.from_div_def
+
+theorem nat.rem_lt : ∀(a b: nat), b ≠ zero -> a % b < b  := by
+  apply divrem.induction
+
+  {
+    intro a b b_nz a_lt_b
+    unfold HMod.hMod instHMod Mod.mod nat.Rem nat.remainder divrem.calc
+    simp
+    split
+    contradiction
+    unfold divrem.induction.bounded
+    split
+    simp
+    assumption
+    contradiction
+  }
+
+  {
+    intro a b b_nz a_ge_b prev
+    unfold HMod.hMod instHMod Mod.mod nat.Rem nat.remainder divrem.calc
+    unfold HMod.hMod instHMod Mod.mod nat.Rem nat.remainder divrem.calc at prev
+    simp
+    simp at prev
+    match b with
+    | .inc b =>
+    simp
+    unfold divrem.induction.bounded
+    split
+    next h _ => {
+      have := Compare.not_lt_and_le _ _ h
+      contradiction
+    }
+    simp at prev
+    simp
+    rw [divrem.induction.bounded.counter_irr]
+    assumption
+  }
+
+#print axioms nat.rem_lt
+
+theorem nat.rem_le: ∀(a b: nat), b ≠ zero -> a % b <= a  := by
+  apply divrem.induction
+
+  {
+    intro a b b_nz a_lt_b
+    unfold HMod.hMod instHMod Mod.mod nat.Rem nat.remainder divrem.calc
+    simp
+    split
+    contradiction
+    unfold divrem.induction.bounded
+    split
+    simp
+    apply Compare.le_id
+    contradiction
+  }
+
+  {
+    intro a b b_nz a_ge_b prev
+    unfold HMod.hMod instHMod Mod.mod nat.Rem nat.remainder divrem.calc
+    unfold HMod.hMod instHMod Mod.mod nat.Rem nat.remainder divrem.calc at prev
+    simp
+    simp at prev
+    match b with
+    | .inc b =>
+    simp
+    unfold divrem.induction.bounded
+    split
+    next h _ => {
+      have := Compare.not_lt_and_le _ _ h
+      contradiction
+    }
+    simp at prev
+    simp
+    rw [divrem.induction.bounded.counter_irr]
+    apply Compare.le_trans prev
+    apply nat.sub_is_le
+  }
+
+#print axioms nat.rem_lt
