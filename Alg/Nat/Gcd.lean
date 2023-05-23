@@ -145,7 +145,7 @@ theorem gcd.le : ∀(a b: nat), gcd a b <= a ∧ gcd a b <= b ∨ a = nat.zero �
 
 #print axioms gcd.le
 
-theorem gcd.of_dvd : ∀ (a b x: nat), x ∣ a -> x ∣ b -> x ∣ gcd a b := by
+theorem gcd.of_dvd : ∀ {a b x: nat}, x ∣ a -> x ∣ b -> x ∣ gcd a b := by
   apply gcd.induction
   {
     intro b
@@ -157,10 +157,12 @@ theorem gcd.of_dvd : ∀ (a b x: nat), x ∣ a -> x ∣ b -> x ∣ gcd a b := by
     intro a b a_nz prev
     intro x dvd_a dvd_b
     rw [gcd.induct a_nz]
-    exact (prev x · dvd_a) (dvd.of_rem b a a_nz dvd_b dvd_a)
+    exact (prev · dvd_a) (dvd.of_rem b a a_nz dvd_b dvd_a)
   }
 
-theorem gcd.to_dvd : ∀ (a b x: nat), x ∣ gcd a b -> x ∣ a ∧ x ∣ b := by
+#print axioms gcd.of_dvd
+
+theorem gcd.to_dvd : ∀ {a b x: nat}, x ∣ gcd a b -> x ∣ a ∧ x ∣ b := by
   apply gcd.induction
   {
     intro b
@@ -174,10 +176,21 @@ theorem gcd.to_dvd : ∀ (a b x: nat), x ∣ gcd a b -> x ∣ a ∧ x ∣ b := b
     intro a b a_nz prev
     intro x dvd_gcd
     rw [gcd.induct a_nz] at dvd_gcd
-    have ⟨ dvd_rem, dvd_a ⟩  := prev x dvd_gcd
+    have ⟨ dvd_rem, dvd_a ⟩  := prev dvd_gcd
     apply And.intro
     assumption
     exact dvd.rem_cancel_right b a a_nz dvd_a dvd_rem
   }
 
 #print axioms gcd.to_dvd
+
+theorem gcd.is_dvd (a b: nat) : gcd a b ∣ a ∧ gcd a b ∣ b := gcd.to_dvd (dvd.id _)
+
+#print axioms gcd.to_dvd
+
+theorem gcd.id (a: nat) : gcd a a = a := by
+  apply dvd.to_eq
+  exact (gcd.is_dvd a a).left
+  exact gcd.of_dvd (dvd.id a) (dvd.id _)
+
+#print axioms gcd.id
