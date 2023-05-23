@@ -90,37 +90,48 @@ theorem gcd.of_bounded (a b: nat) :
 
 #print axioms gcd.of_bounded
 
+theorem gcd.base b : gcd nat.zero b = b := rfl
+
+#print axioms gcd.base
+
+theorem gcd.induct {a b: nat} (a_nz: a ≠ .zero) : gcd a b = gcd (b % a) a := by
+  conv => {
+    lhs
+    unfold gcd gcd.induction gcd.induction.bounded
+  }
+  match a with
+  | .inc a =>
+  simp
+  rw [gcd.of_bounded]
+
+#print axioms gcd.induct
+
 theorem gcd.le : ∀(a b: nat), gcd a b <= a ∧ gcd a b <= b ∨ a = nat.zero ∨ b = nat.zero := by
   apply gcd.induction
   {
     intro b
-    rw [gcd.zero_left]
+    rw [gcd.base]
     apply Or.inr
     apply Or.inl
     rfl
   }
   {
     intro a b a_nz prev
-    unfold gcd gcd.induction gcd.induction.bounded
-    simp
-    split
-    contradiction
-    cases b with
-    | zero =>
+    rw [gcd.induct a_nz]
+    match b with
+    | .zero =>
       apply Or.inr
       apply Or.inr
       rfl
-    | inc b =>
+    | .inc b =>
     apply Or.inl
-    rw [gcd.of_bounded]
     match prev with
     | .inr (.inr _) => contradiction
     | .inr (.inl rem_eq_zero) =>
-      rw [rem_eq_zero]
-      rw [gcd.zero_left]
+      rw [rem_eq_zero, gcd.zero_left]
       apply And.intro
       apply Compare.le_id
-      have := dvd.of_rem_zero nat.noConfusion rem_eq_zero
+      have := dvd.of_rem_zero a_nz rem_eq_zero
       exact this.is_le nat.noConfusion
     | .inl ⟨ left, right ⟩ =>
       clear prev
@@ -129,7 +140,7 @@ theorem gcd.le : ∀(a b: nat), gcd a b <= a ∧ gcd a b <= b ∨ a = nat.zero �
       apply Compare.le_id
       apply Compare.le_trans left
       apply nat.rem_le 
-      exact nat.noConfusion
+      exact a_nz
   }
 
 #print axioms gcd.le
