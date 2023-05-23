@@ -194,3 +194,77 @@ theorem gcd.id (a: nat) : gcd a a = a := by
   exact gcd.of_dvd (dvd.id a) (dvd.id _)
 
 #print axioms gcd.id
+
+theorem gcd.zero_right (a: nat) : gcd a nat.zero = a := by
+  apply dvd.to_eq
+  exact (gcd.is_dvd a nat.zero).left
+  exact gcd.of_dvd (dvd.id a) (dvd.zero _)
+
+#print axioms gcd.zero_right
+
+theorem gcd.comm (a b: nat) : gcd a b = gcd b a := by
+  apply dvd.to_eq
+  have := gcd.is_dvd a b
+  apply gcd.of_dvd
+  exact this.right
+  exact this.left
+  have := gcd.is_dvd b a
+  apply gcd.of_dvd
+  exact this.right
+  exact this.left
+
+#print axioms gcd.comm
+
+theorem dvd.to_gcd_left {a b: nat} (d: a ∣ c) : gcd a b ∣ c := by
+  apply dvd.trans _ d
+  have := gcd.is_dvd a b
+  exact (gcd.is_dvd a b).left
+
+#print axioms dvd.to_gcd_left
+
+theorem dvd.to_gcd_right {a b: nat} (d: b ∣ c) : gcd a b ∣ c := by
+  apply dvd.trans _ d
+  have := gcd.is_dvd a b
+  exact (gcd.is_dvd a b).right
+
+#print axioms dvd.to_gcd_right
+
+theorem gcd.assoc (a b c: nat) : gcd a (gcd b c) = gcd (gcd a b) c := by
+  apply dvd.to_eq
+  have abc := gcd.is_dvd a (gcd b c)
+  have bc := gcd.is_dvd b c
+  apply gcd.of_dvd
+  apply gcd.of_dvd
+  exact abc.left
+  apply dvd.to_gcd_right
+  exact bc.left
+  apply dvd.to_gcd_right
+  exact bc.right
+  
+  have abc := gcd.is_dvd (gcd a b) c
+  have ab := gcd.is_dvd a b
+  apply gcd.of_dvd
+  apply dvd.to_gcd_left
+  exact ab.left
+  apply gcd.of_dvd
+  apply dvd.to_gcd_left
+  exact ab.right
+  exact abc.right
+
+#print axioms gcd.assoc
+
+theorem dvd.gcd_left {a b: nat} (d: a ∣ b) : gcd a b = a := by
+  apply dvd.to_eq
+  exact (gcd.is_dvd a b).left
+  have := gcd.of_dvd (dvd.id _) d
+  exact this
+
+#print axioms dvd.gcd_left
+
+theorem dvd.gcd_right {a b: nat} (d: b ∣ a) : gcd a b = b := by
+  apply dvd.to_eq
+  exact (gcd.is_dvd a b).right
+  have := gcd.of_dvd d (dvd.id _)
+  exact this
+
+#print axioms dvd.gcd_right
