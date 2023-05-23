@@ -1,4 +1,5 @@
 import Alg.Nat.Mul.Cmp
+import Alg.Nat.Mul.Sub
 
 def dvd (a b: nat) := ∃x, b = a * x
 
@@ -98,6 +99,8 @@ theorem dvd.to_add : x | a -> x | b -> x | (a + b) := by
   rw [nat.mul_add_left]
   rw [←prfa, ←prfb]
 
+#print axioms dvd.to_add
+
 theorem dvd.to_mul : x | a -> x | b -> x | (a * b) := by 
   intro ax bx
   have ⟨ a₀, prfa ⟩ := ax
@@ -107,3 +110,35 @@ theorem dvd.to_mul : x | a -> x | b -> x | (a * b) := by
   rw [←prfa]
   rw [←nat.mul_perm_a_bc_to_ab_c]
   rw [←prfb]
+
+#print axioms dvd.to_mul
+
+theorem dvd.add_cancel_left : x | a -> x | (a + b) -> x | b := by
+  intro ax abx
+  cases x
+  have := abx.by_zero
+  have ⟨ _, b_eq_zero ⟩ := nat.add_eq_zero this
+  rw [b_eq_zero]
+  unfold dvd
+  exists nat.zero
+  next x => {
+    have ⟨ a₀, prfa ⟩ := ax
+    have ⟨ ab₀, prfab ⟩ := abx
+    exists ab₀ - a₀
+    rw [nat.mul_sub_left]
+    rw [←prfab, ←prfa]
+    rw [nat.sub_add_inv]
+    rw [prfa] at prfab
+    have : nat.inc x ≠ .zero := nat.noConfusion
+    apply nat.of_le_mul_left_irr this
+    rw [←prfab]
+    apply nat.a_le_a_add_b
+  }
+
+#print axioms dvd.add_cancel_left
+
+theorem dvd.add_cancel_right : x | b -> x | (a + b) -> x | a := by
+  rw [nat.add_comm]
+  apply dvd.add_cancel_left
+
+#print axioms dvd.add_cancel_right

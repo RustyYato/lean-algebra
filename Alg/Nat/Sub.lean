@@ -28,6 +28,9 @@ theorem nat.sub_le : a <= b -> a - b = nat.zero := fun a_le_b => match a with
 theorem nat.sub_zero { a: nat } : a - nat.zero = a := by
   cases a <;> rfl
 
+theorem nat.sub_zero_left { a: nat } : nat.zero - a = .zero := by
+  cases a <;> rfl
+
 #print axioms nat.sub_zero
 
 theorem nat.sub_inc { a b: nat } : inc a - inc b = a - b := by
@@ -154,3 +157,48 @@ theorem nat.sub_com_right (a b c: nat) : (a + b) - (c + b) = a - c := by
   apply nat.sub_com_left
 
 #print axioms nat.sub_com_right
+
+theorem nat.add_subs (a b c d: nat) :
+  b <= a -> d <= c ->
+  (a - b) + (c - d) = (a + c) - (b + d) := by
+  intro b_le_a d_le_c
+  match b, d with
+  | .zero, .zero =>
+    rw [nat.sub_zero, nat.sub_zero, nat.add_zero_right, nat.sub_zero]
+  | .zero, .inc d => 
+    rw [nat.sub_zero, nat.add_zero_left]
+    match c with
+    | .inc c =>
+    rw [nat.add_inc_right, nat.sub_inc, nat.sub_inc]
+    have : zero + d < zero + inc d := by
+      rw [nat.add_zero_left, nat.add_zero_left]
+      apply nat.lt_inc
+    have := nat.add_subs a .zero c d  (nat.zero_le _) d_le_c
+    rw [nat.sub_zero, nat.add_zero_left] at this
+    assumption
+  | .inc b, .zero =>
+    rw [nat.sub_zero, nat.add_zero_right]
+    match a with
+    | .inc a =>
+    rw [nat.add_inc_left, nat.sub_inc, nat.sub_inc]
+    have : b + zero < inc b + zero := by
+      rw [nat.add_zero_right, nat.add_zero_right]
+      apply nat.lt_inc
+    have := nat.add_subs a b c .zero b_le_a (nat.zero_le _)
+    rw [nat.sub_zero, nat.add_zero_right] at this
+    assumption
+  | .inc b, .inc d =>
+    match a, c with
+    | .inc a, .inc c =>
+    rw [nat.add_inc_left, nat.add_inc_right, nat.add_inc_left, nat.add_inc_right]
+    repeat rw [nat.sub_inc]
+    have : b + d < inc b + inc d := by
+      apply nat.to_lt_add <;> apply nat.lt_inc
+    exact nat.add_subs a b c d b_le_a d_le_c
+termination_by _ => b + d
+decreasing_by {
+  simp_wf
+  assumption
+}
+
+#print axioms nat.add_subs
