@@ -257,3 +257,25 @@ def nat.lt_inc (a:nat) : a < inc a := match a with
 def nat.le_inc (a:nat) : a <= inc a := Or.inl (nat.lt_inc a)
 
 #print axioms nat.lt_inc
+
+instance nat.WF : WellFoundedRelation nat where
+  rel a b := a < b
+  wf := by
+    apply WellFounded.intro
+    intro a
+    induction a with
+    | zero => 
+      apply Acc.intro
+      intro x
+      have := nat.not_lt_zero x
+      intro
+      contradiction
+    | inc a₀ ih =>
+      apply Acc.intro
+      intro x x_lt_a₀
+      match nat.lt_inc_to_le x_lt_a₀ with
+      | .inr e => rw [Compare.ord_to_eq e]; assumption
+      | .inl e => exact ih.inv e
+
+#print axioms nat.WF
+  

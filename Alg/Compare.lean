@@ -321,3 +321,12 @@ theorem Compare.not_lt_and_le [Compare α] (a b: α) : a < b -> b <= a -> False 
 
 #print axioms Compare.not_lt_and_le
 
+
+theorem Compare.not_lt_is_le [Compare α] {a b: α} : ¬a < b -> b <= a := fun not_lt => 
+  match h:Compare.ord b a with
+  | .Eq => Or.inr h
+  | .Less => Or.inl h
+  | .Greater => (not_lt (Compare.flip h)).elim
+
+#print axioms Compare.not_lt_is_le
+
