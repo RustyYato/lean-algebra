@@ -89,3 +89,21 @@ theorem dvd.trans : a | b -> b | c -> a | c := by
   rw [nat.mul_assoc]
 
 #print axioms dvd.trans
+
+theorem dvd.to_add : x | a -> x | b -> x | (a + b) := by 
+  intro ax bx
+  have ⟨ a₀, prfa ⟩ := ax
+  have ⟨ b₀, prfb ⟩ := bx
+  exists a₀ + b₀
+  rw [nat.mul_add_left]
+  rw [←prfa, ←prfb]
+
+theorem dvd.to_mul : x | a -> x | b -> x | (a * b) := by 
+  intro ax bx
+  have ⟨ a₀, prfa ⟩ := ax
+  have ⟨ b₀, prfb ⟩ := bx
+  exists a₀ * x * b₀
+  rw [nat.mul_perm_a_bc_to_ab_c, nat.mul_perm_a_bc_to_ab_c]
+  rw [←prfa]
+  rw [←nat.mul_perm_a_bc_to_ab_c]
+  rw [←prfb]
