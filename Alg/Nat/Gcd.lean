@@ -29,13 +29,13 @@ def nat.gcd.induction
 
 #print axioms nat.gcd.induction
 
-def gcd (a b: nat): nat := @nat.gcd.induction (fun _ _ => nat) id (fun _ _ _ prev => prev) a b
+def nat.gcd (a b: nat): nat := @nat.gcd.induction (fun _ _ => nat) id (fun _ _ _ prev => prev) a b
 
 def nat.coprime (a b: nat) := gcd a b = nat.zero.inc
 
-#print axioms gcd
+#print axioms nat.gcd
 
-example : gcd nat.zero.inc.inc.inc.inc nat.zero.inc.inc.inc.inc.inc.inc = nat.zero.inc.inc := by decide
+example : nat.gcd nat.zero.inc.inc.inc.inc nat.zero.inc.inc.inc.inc.inc.inc = nat.zero.inc.inc := by decide
 
 theorem nat.gcd.induct.step (a b x: nat) (a_lt_x: a < x.inc) (a_nz: a ≠ .zero) : b % a < x := by
   apply Compare.lt_le_trans _ (nat.lt_inc_to_le a_lt_x)
@@ -215,14 +215,14 @@ theorem nat.gcd.comm (a b: nat) : gcd a b = gcd b a := by
 
 #print axioms nat.gcd.comm
 
-theorem dvd.to_gcd_left {a b: nat} (d: a ∣ c) : gcd a b ∣ c := by
+theorem dvd.to_gcd_left {a b: nat} (d: a ∣ c) : a.gcd b ∣ c := by
   apply dvd.trans _ d
   have := nat.gcd.is_dvd a b
   exact (nat.gcd.is_dvd a b).left
 
 #print axioms dvd.to_gcd_left
 
-theorem dvd.to_gcd_right {a b: nat} (d: b ∣ c) : gcd a b ∣ c := by
+theorem dvd.to_gcd_right {a b: nat} (d: b ∣ c) : a.gcd b ∣ c := by
   apply dvd.trans _ d
   have := nat.gcd.is_dvd a b
   exact (nat.gcd.is_dvd a b).right
@@ -253,7 +253,7 @@ theorem nat.gcd.assoc (a b c: nat) : gcd a (gcd b c) = gcd (gcd a b) c := by
 
 #print axioms nat.gcd.assoc
 
-theorem dvd.gcd_left {a b: nat} (d: a ∣ b) : gcd a b = a := by
+theorem dvd.gcd_left {a b: nat} (d: a ∣ b) : a.gcd b = a := by
   apply dvd.to_eq
   exact (nat.gcd.is_dvd a b).left
   have := nat.gcd.of_dvd (dvd.id _) d
@@ -261,7 +261,7 @@ theorem dvd.gcd_left {a b: nat} (d: a ∣ b) : gcd a b = a := by
 
 #print axioms dvd.gcd_left
 
-theorem dvd.gcd_right {a b: nat} (d: b ∣ a) : gcd a b = b := by
+theorem dvd.gcd_right {a b: nat} (d: b ∣ a) : a.gcd b = b := by
   apply dvd.to_eq
   exact (nat.gcd.is_dvd a b).right
   have := nat.gcd.of_dvd d (dvd.id _)
@@ -313,3 +313,12 @@ theorem nat.gcd.mul_left : gcd (x * a) (x * b) = x * gcd a b := by
     apply dvd.to_mul_com_left
     exact (nat.gcd.is_dvd a b).right
   }
+
+#print axioms nat.gcd.mul_left
+
+theorem nat.coprime.gcd (c: nat.coprime a b) : nat.gcd a b = nat.zero.inc := c
+
+theorem nat.coprime.comm (c: nat.coprime a b) : nat.coprime b a := by
+  unfold nat.coprime
+  rw [gcd.comm]
+  exact c
