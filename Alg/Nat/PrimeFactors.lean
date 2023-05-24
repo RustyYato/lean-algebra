@@ -234,3 +234,8 @@ theorem PrimeFactorization.unique (a b: PrimeFactorization n): a = b := by
   congr
 
 #print axioms PrimeFactorization.unique
+
+instance (a b: PrimeFactorization n) : Decidable (a = b) := Decidable.isTrue (PrimeFactorization.unique a b)
+
+instance : Subsingleton (PrimeFactorization n) where
+  allEq := PrimeFactorization.unique
