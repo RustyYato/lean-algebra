@@ -25,3 +25,20 @@ def List.sorted.pop [Compare α] (as: List α) (a: α) : (a::as).sorted -> as.so
   match as with
   | [] => trivial
   | a'::as' => exact aas_sorted.right
+
+def List.any_and_all_not {P: α -> Prop} (list: List α)
+  (any: list.anyP P)
+  (all_not: list.allP (fun x => ¬ P x)):
+  False
+   := match list with
+  | [] => any.elim
+  | _::xs => match any with
+     | .inl px => all_not.left px
+     | .inr pxs => xs.any_and_all_not pxs all_not.right
+
+def List.allP.map {P Q: α -> Prop} {list: List α}
+  (all: list.allP P): (∀{x}, P x -> Q x) -> list.allP Q
+   := fun p_to_q => match list with
+  | [] => True.intro
+  | _::_ => 
+    ⟨ (p_to_q all.left), all.right.map p_to_q ⟩

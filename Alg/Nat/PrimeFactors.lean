@@ -225,6 +225,7 @@ theorem PrimeFactorization.unique_raw
 
 #print axioms PrimeFactorization.unique_raw
 
+@[simp]
 theorem PrimeFactorization.unique (a b: PrimeFactorization n): a = b := by
   have a_factors_eq_b_factors := PrimeFactorization.unique_raw
     a.factors a.all_primes a.eq_n a.sorted
@@ -237,5 +238,36 @@ theorem PrimeFactorization.unique (a b: PrimeFactorization n): a = b := by
 
 instance (a b: PrimeFactorization n) : Decidable (a = b) := Decidable.isTrue (PrimeFactorization.unique a b)
 
+instance (h: n ≠ nat.zero) : Inhabited (PrimeFactorization n) where
+  default := n.factorize h
+
 instance : Subsingleton (PrimeFactorization n) where
   allEq := PrimeFactorization.unique
+
+def list_product.eq_zero : nat.zero = list_product ns -> ns.containsP nat.zero := by
+  intro x_eq_zero
+  match ns with
+  | [] => contradiction
+  | x::xs =>
+  match nat.mul_eq_zero x_eq_zero.symm with
+  | .inl h =>
+    apply Or.inl
+    exact h.symm
+  | .inr h => 
+    apply List.containsP.pop
+    apply list_product.eq_zero
+    exact h.symm
+
+#print axioms list_product.eq_zero
+
+theorem no_factorization_for_zero: PrimeFactorization nat.zero -> False := by
+  intro f
+  have := list_product.eq_zero f.eq_n
+  apply f.factors.any_and_all_not this
+  apply f.all_primes.map
+  intro x xprime x_eq_zero
+  rw [←x_eq_zero] at xprime
+  have := zero_not_prime
+  contradiction
+
+#print axioms no_factorization_for_zero
