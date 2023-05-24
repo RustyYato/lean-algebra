@@ -318,7 +318,6 @@ theorem nat.gcd.mul_right : gcd (a * x) (b * x) = (gcd a b) * x := by
   rw [nat.mul_comm a, nat.mul_comm b]
   rw [nat.gcd.mul_left, nat.mul_comm]
 
-
 #print axioms nat.gcd.mul_left
 
 theorem nat.coprime.gcd (c: nat.coprime a b) : nat.gcd a b = nat.zero.inc := c

@@ -344,3 +344,9 @@ theorem Compare.not_lt_id [Compare α] {a: α} : ¬a < a := by
   contradiction
 
 #print axioms Compare.not_lt_id
+
+def Compare.le_to_eq {{ α: Sort _ }} [Compare α] (a b: α) :
+  a <= b -> b <= a -> a = b := fun a_le_b b_le_a => match a_le_b with
+    | .inl h => (Compare.not_lt_and_le _ _ h b_le_a).elim
+    | .inr h => Compare.ord_to_eq h
+      
