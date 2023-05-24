@@ -152,6 +152,21 @@ theorem dvd.of_eq {a b: nat} (a_eq_b: a = b) : dvd a b := by
   rw [a_eq_b]
   exact dvd.id _
 
+theorem smallest_factor.nz (n: nat) : n ≠ .zero -> n.smallest_factor ≠ .zero := by
+  intro one_lt_n
+  match n with
+  | .zero => contradiction
+  | .inc .zero => exact nat.noConfusion
+  | .inc (.inc n) =>
+  unfold nat.smallest_factor
+  simp
+  intro eq
+  have := smallest_factor_from.ge_start n.inc.inc n.inc nat.zero.inc.inc (nat.smallest_factor.proof_1 _) (nat.smallest_factor.proof_2 _) nat.smallest_factor.proof_3
+  rw [eq] at this
+  contradiction
+
+#print axioms smallest_factor.nz
+
 theorem smallest_factor.ge_two (n: nat) : nat.zero.inc < n -> nat.zero.inc.inc <= n.smallest_factor := by
   intro one_lt_n
   match n with

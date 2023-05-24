@@ -274,3 +274,29 @@ theorem nat.to_lt_mul {a b c d: nat} : a < c -> b < d -> a * b < c * d := by
     assumption
 
 #print axioms nat.to_lt_mul
+
+theorem nat.mul_factor_lt {a b c: nat} : a = b * c -> a ≠ nat.zero -> nat.zero.inc.inc <= c -> b < a := by
+  intro a_eq_bc a_nz c_gt_one
+  match c with
+  | .zero | .inc .zero => contradiction
+  | .inc (.inc c) =>
+  match b with
+  | .zero => 
+    rw [nat.mul_zero_left] at a_eq_bc
+    contradiction
+  | .inc b =>
+    rw [nat.mul_inc_right, nat.mul_inc_right] at a_eq_bc
+    conv at a_eq_bc  => {
+      rhs
+      rhs
+      rw [nat.add_inc_left]
+    }
+    rw [a_eq_bc]
+    conv => {
+      lhs
+      rw [←@nat.add_zero_right b.inc]
+    }
+    apply nat.to_lt_add_left_irr
+    apply nat.zero_lt_inc
+
+#print axioms nat.mul_factor_lt
