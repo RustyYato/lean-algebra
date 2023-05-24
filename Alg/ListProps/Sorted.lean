@@ -126,7 +126,7 @@ def List.sorted_push.keeps_anyP [Compare α] (list: List α) (x: α) (P: α -> P
 
 #print axioms List.sorted_push.keeps_allP
 
-def List.sorted_push.contains [Compare α] (list: List α) (x y: α) (P: α -> Prop) : list.containsP y ∨ y = x -> (list.sorted_push x).containsP y := by
+def List.sorted_push.contains [Compare α] (list: List α) (x y: α) : list.containsP y ∨ y = x -> (list.sorted_push x).containsP y := by
   unfold List.containsP
   apply List.sorted_push.keeps_anyP
 
