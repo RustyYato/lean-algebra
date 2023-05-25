@@ -254,7 +254,7 @@ theorem List.sorted_intersect.empty_right [Compare α] : ∀{as bs: List α}, bs
 
 #print axioms List.sorted_intersect.empty_right
 
-theorem List.sorted_intersect.induct_lt.helper [Compare α] : ∀(as bs cs ds: List α) (c d: α), as = c::cs -> bs = d::ds -> c < d -> as.sorted_intersect bs = cs.sorted_intersect bs := by
+theorem List.sorted_intersect.induct_lt.helper [Compare α] : ∀(as bs cs ds: List α) (c d: α), as = c::cs -> bs = d::ds -> Compare.ord c d = Order.Less -> as.sorted_intersect bs = cs.sorted_intersect bs := by
   apply List.sorted_intersect.induction
 
   {
@@ -307,7 +307,7 @@ theorem List.sorted_intersect.induct_lt.helper [Compare α] : ∀(as bs cs ds: L
     contradiction
   }
 
-theorem List.sorted_intersect.induct_lt [Compare α] : ∀(a b: α) (as bs: List α), a < b -> (a::as).sorted_intersect (b::bs) = as.sorted_intersect (b::bs) := by
+theorem List.sorted_intersect.induct_lt [Compare α] : ∀{a b: α} {as bs: List α}, Compare.ord a b = Order.Less -> (a::as).sorted_intersect (b::bs) = as.sorted_intersect (b::bs) := by
   intro a b as bs 
   apply List.sorted_intersect.induct_lt.helper 
   rfl
@@ -370,7 +370,7 @@ theorem List.sorted_intersect.induct_eq.helper [Compare α] : ∀(as bs cs ds: L
     contradiction
   }
 
-theorem List.sorted_intersect.induct_eq [Compare α] : ∀(a b: α) (as bs: List α), Compare.ord a b = Order.Eq -> (a::as).sorted_intersect (b::bs) = a::(as.sorted_intersect bs) := by
+theorem List.sorted_intersect.induct_eq [Compare α] : ∀{a b: α} {as bs: List α}, Compare.ord a b = Order.Eq -> (a::as).sorted_intersect (b::bs) = a::(as.sorted_intersect bs) := by
   intro a b as bs 
   apply List.sorted_intersect.induct_eq.helper
   rfl
@@ -378,7 +378,7 @@ theorem List.sorted_intersect.induct_eq [Compare α] : ∀(a b: α) (as bs: List
 
 #print axioms List.sorted_intersect.induct_eq
 
-theorem List.sorted_intersect.induct_gt.helper [Compare α] : ∀(as bs cs ds: List α) (c d: α), as = c::cs -> bs = d::ds -> c > d -> as.sorted_intersect bs = as.sorted_intersect ds := by
+theorem List.sorted_intersect.induct_gt.helper [Compare α] : ∀(as bs cs ds: List α) (c d: α), as = c::cs -> bs = d::ds -> Compare.ord c d = Order.Greater -> as.sorted_intersect bs = as.sorted_intersect ds := by
   apply List.sorted_intersect.induction
 
   {
@@ -399,7 +399,7 @@ theorem List.sorted_intersect.induct_gt.helper [Compare α] : ∀(as bs cs ds: L
     have ⟨ a_eq_c, as_eq_cs ⟩  := List.cons.inj as_eq_cs
     have ⟨ b_eq_d, bs_eq_ds ⟩  := List.cons.inj bs_eq_ds
     rw [a_eq_c, b_eq_d] at a_ord_b
-    rw [Compare.flip c_gt_d] at a_ord_b
+    rw [c_gt_d] at a_ord_b
     contradiction
   }
 
@@ -409,7 +409,7 @@ theorem List.sorted_intersect.induct_gt.helper [Compare α] : ∀(as bs cs ds: L
     have ⟨ a_eq_c, as_eq_cs ⟩  := List.cons.inj as_eq_cs
     have ⟨ b_eq_d, bs_eq_ds ⟩  := List.cons.inj bs_eq_ds
     rw [a_eq_c, b_eq_d] at a_ord_b
-    rw [Compare.flip c_gt_d] at a_ord_b
+    rw [c_gt_d] at a_ord_b
     contradiction
   }
 
@@ -433,7 +433,7 @@ theorem List.sorted_intersect.induct_gt.helper [Compare α] : ∀(as bs cs ds: L
     rfl
   }
 
-theorem List.sorted_intersect.induct_gt [Compare α] : ∀(a b: α) (as bs: List α), a > b -> (a::as).sorted_intersect (b::bs) = (a::as).sorted_intersect bs := by
+theorem List.sorted_intersect.induct_gt [Compare α] : ∀{a b: α} {as bs: List α}, Compare.ord a b = Order.Greater -> (a::as).sorted_intersect (b::bs) = (a::as).sorted_intersect bs := by
   intro a b as bs 
   apply List.sorted_intersect.induct_gt.helper
   rfl
@@ -461,7 +461,7 @@ theorem List.sorted_intersect.contains [Compare α] : ∀(as bs: List α) (x: α
   {
     intro a as b bs a_ord_b prev
     intro x as_con bs_con as_sort bs_sort
-    rw [induct_lt]
+    rw [induct_lt a_ord_b]
     apply prev
     match as_con with
     | .inl h =>
@@ -478,7 +478,7 @@ theorem List.sorted_intersect.contains [Compare α] : ∀(as bs: List α) (x: α
   {
     intro a as b bs a_ord_b prev
     intro x as_con bs_con as_sort bs_sort
-    rw [induct_eq]
+    rw [induct_eq a_ord_b]
     match as_con with
     | .inl h =>
       rw [h]
@@ -500,12 +500,11 @@ theorem List.sorted_intersect.contains [Compare α] : ∀(as bs: List α) (x: α
         assumption
         apply List.sorted.pop
         assumption
-    assumption
   }
   {
     intro a as b bs a_ord_b prev
     intro x as_con bs_con as_sort bs_sort
-    rw [induct_gt]
+    rw [induct_gt a_ord_b]
     apply prev
     assumption
     match bs_con with
@@ -519,7 +518,6 @@ theorem List.sorted_intersect.contains [Compare α] : ∀(as bs: List α) (x: α
     assumption
     apply List.sorted.pop
     repeat assumption
-    exact Compare.flip a_ord_b
   }
 
 #print axioms List.sorted_intersect.contains
