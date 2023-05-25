@@ -1,0 +1,76 @@
+import Alg.Nat.PrimeFactors
+import Alg.ListProps.Sorted.Intersect
+
+theorem list_product.of_sorted_intersect :
+  ∀{as bs: List nat},
+  list_product (as.sorted_intersect bs) = (list_product as) * (list_product bs) := by
+  apply List.sorted.induction
+  {
+    intro bs
+    rw [List.sorted_intersect.empty_left, list_product.empty, nat.mul_one_left]
+  }
+  {
+    intro a as
+    rw [List.sorted_intersect.empty_right, list_product.empty, nat.mul_one_right]
+  }
+  {
+    intro a as b bs a_ord_b prev
+    rw [List.sorted_intersect.induct_lt a_ord_b]
+    conv => {
+      lhs
+      unfold list_product
+    }
+    conv => {
+      rhs
+      lhs
+      unfold list_product
+    }
+    rw [nat.mul_perm_ab_c_to_a_bc]
+    apply nat.to_mul_irr_left
+    assumption
+  }
+  {
+    intro a as b bs a_ord_b prev
+    rw [List.sorted_intersect.induct_eq a_ord_b]
+    simp
+    rw [nat.mul_perm_ab_c_to_a_bc]
+    apply nat.to_mul_irr_left
+    rw [nat.mul_perm_a_bc_to_b_ac]
+    apply nat.to_mul_irr_left
+    assumption
+  }
+  {
+    intro a as b bs a_ord_b prev
+    rw [List.sorted_intersect.induct_gt a_ord_b]
+    conv => {
+      lhs
+      unfold list_product
+    }
+    conv => {
+      rhs
+      rhs
+      unfold list_product
+    }
+    rw [nat.mul_perm_a_bc_to_b_ac]
+    apply nat.to_mul_irr_left
+    assumption
+  }
+
+#print axioms list_product.of_sorted_intersect
+
+theorem PrimeFactorization.merge
+  (fa: PrimeFactorization a)
+  (fb: PrimeFactorization b):
+  PrimeFactorization (a.gcd b) := by
+  apply PrimeFactorization.mk (fa.factors.sorted_intersect fb.factors)
+  apply List.sorted_intersect.keeps_allP
+  exact fa.all_primes
+  exact fb.all_primes
+  rw [list_product.of_sorted_intersect]
+  rw [←fa.eq_n]
+  rw [←fb.eq_n]
+  apply List.sorted_intersect.keeps_sorted
+  exact fa.sorted
+  exact fb.sorted
+
+#print axioms PrimeFactorization.merge

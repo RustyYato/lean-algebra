@@ -10,6 +10,8 @@ def List.anyP (list: List α) (P: α -> Prop) := match list with
 
 def List.containsP (list: List α) (a: α) := list.anyP (fun x => a = x)
 
+def List.containsP.split {a} {as: List α} : ∀{x}, (a::as).containsP x -> x = a ∨ as.containsP x := id
+
 def List.sorted [Compare α] (list: List α): Prop := match list with
  | [] | [_] => True
  | a :: b :: rest => a <= b ∧ (b::rest).sorted
@@ -87,3 +89,125 @@ def List.contains_sorted [Compare α] {x a: α} : (a::as).containsP x -> (a::as)
     apply Compare.le_trans as_sort.left
     apply List.contains_sorted _ as_sort.right
     assumption
+
+def List.sublist_of (a b: List α) := ∀x, a.containsP x -> b.containsP x
+
+def List.sublist_of.of_empty {as: List α} : as.sublist_of [] -> as = [] := by
+  intro sub
+  match as with
+  | [] => rfl
+  | x::_ =>
+    have := sub x (Or.inl rfl)
+    contradiction
+
+#print axioms List.sublist_of.of_empty
+
+def List.sublist_of.empty {as: List α} : [].sublist_of as := by
+  intro x con
+  contradiction
+
+#print axioms List.sublist_of.of_empty
+
+def List.sublist_of.pop_left {a: α} {as bs: List α} : (a::as).sublist_of bs -> as.sublist_of bs := by
+  intro sub
+  match bs with
+  | [] =>
+    have := List.sublist_of.of_empty sub
+    contradiction
+  | b::bs' =>
+  match as with
+  | [] => exact List.sublist_of.empty
+  | a'::as' =>
+  intro x as_cont
+  apply sub x
+  apply Or.inr
+  assumption
+
+#print axioms List.sublist_of.pop_left
+
+def List.sublist_of.push_left {a: α} {as bs: List α} : bs.containsP a -> as.sublist_of bs -> (a::as).sublist_of bs := by
+  intro conb sub
+  intro x cona
+  match cona with
+  | .inl h => rw [h]; assumption
+  | .inr h => exact sub x h
+
+#print axioms List.sublist_of.push_left
+
+def List.sublist_of.pop_right {b: α} {as bs: List α} : ¬as.containsP b -> as.sublist_of (b::bs) -> as.sublist_of bs := by
+  intro not_con sub
+  intro x acon
+  match sub x acon with
+  | .inr h => assumption
+  | .inl h =>
+    rw [h] at acon
+    contradiction
+
+#print axioms List.sublist_of.pop_right
+
+def List.sublist_of.push_right {b: α} {as bs: List α}: as.sublist_of bs -> as.sublist_of (b::bs) := by
+  intro sub
+  intro x acon
+  apply Or.inr
+  exact sub x acon
+
+#print axioms List.sublist_of.push_right
+
+def List.containsP.allP {as: List α} : ∀{x}, as.containsP x -> as.allP P -> P x := by
+  intro x con all
+  match as with
+  | [] => contradiction
+  | a::as' =>
+    match con.split with
+    | .inl h => rw [h]; exact all.left
+    | .inr h => exact h.allP all.right
+
+#print axioms List.containsP.allP
+
+def List.containsP.anyP {as: List α} : ∀{x}, as.containsP x -> P x -> as.anyP P := by
+  intro x con px
+  match as with
+  | [] => contradiction
+  | a::as' =>
+    match con.split with
+    | .inl h => rw [h] at px; exact Or.inl px
+    | .inr h => exact Or.inr (h.anyP px)
+
+#print axioms List.containsP.anyP
+
+def List.sublist_of.allP {as bs: List α} : as.sublist_of bs -> (∀{P}, bs.allP P -> as.allP P) := by
+  intro sub P bs_all
+  match as with
+  | [] => trivial
+  | a::as' =>
+    apply And.intro
+    exact (sub a (Or.inl rfl)).allP bs_all
+    apply List.sublist_of.allP
+    exact sub.pop_left
+    assumption
+
+#print axioms List.sublist_of.allP
+
+def List.sublist_of.anyP {as bs: List α} : as.sublist_of bs -> (∀{P}, as.anyP P -> bs.anyP P) := by
+  intro sub P bs_any
+  match as with
+  | [] => contradiction
+  | a::as' =>
+    match bs_any with
+    | .inl h =>
+      have conb := sub a (Or.inl rfl)
+      exact conb.anyP h
+    | .inr h => exact sub.pop_left.anyP h
+
+#print axioms List.sublist_of.anyP
+
+def List.sublist_of.trans {as bs cs: List α} : as.sublist_of bs -> bs.sublist_of cs -> as.sublist_of cs := by
+  intro sub_ab sub_bc
+  match as with
+  | [] => exact List.sublist_of.empty
+  | a::as' =>
+    apply List.sublist_of.push_left
+    exact sub_bc a (sub_ab a (Or.inl rfl))
+    apply List.sublist_of.trans sub_ab.pop_left sub_bc
+
+#print axioms List.sublist_of.trans
