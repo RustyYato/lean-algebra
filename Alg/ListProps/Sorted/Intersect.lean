@@ -521,3 +521,100 @@ theorem List.sorted_intersect.contains [Compare α] : ∀(as bs: List α) (x: α
   }
 
 #print axioms List.sorted_intersect.contains
+
+theorem List.sorted_intersect.keeps_sorted.helper [Compare α] {x: α} : 
+  ∀ {as bs},
+  sorted (x::as) ->
+  sorted (x::bs) ->
+  sorted (sorted_intersect as bs) ->
+  sorted (x :: sorted_intersect as bs) := by
+  apply induction
+  {
+    intro _
+    intro _ _ _
+    rw [empty_left rfl]
+    assumption
+  }
+  {
+    intro _
+    intro _ _ _
+    rw [empty_right rfl]
+    assumption
+  }
+  {
+    intro a as b bs a_ord_b prev
+    intro as_sort bs_sort i_sort
+    rw [induct_lt a_ord_b]
+    rw [induct_lt a_ord_b] at i_sort
+    apply prev
+    exact as_sort.pop_snd
+    assumption
+    assumption
+  }
+  {
+    intro a as b bs a_ord_b _
+    intro as_sort _ i_sort
+    rw [induct_eq a_ord_b]
+    rw [induct_eq a_ord_b] at i_sort
+    apply And.intro
+    exact as_sort.left
+    assumption
+  }
+  {
+    intro a as b bs a_ord_b prev
+    intro as_sort bs_sort i_sort
+    rw [induct_gt a_ord_b]
+    rw [induct_gt a_ord_b] at i_sort
+    apply prev
+    assumption
+    exact bs_sort.pop_snd
+    assumption
+  }
+
+theorem List.sorted_intersect.keeps_sorted [Compare α] : ∀(as bs: List α),
+  as.sorted ->
+  bs.sorted ->
+  (as.sorted_intersect bs).sorted := by
+  apply List.sorted_intersect.induction
+  {
+    intro _
+    intro _ _
+    rw [empty_left rfl]
+    assumption
+  }
+  {
+    intro _
+    intro _ _
+    rw [empty_right rfl]
+    assumption
+  }
+  {
+    intro a as b bs a_ord_b prev
+    intro as_sort bs_sort
+    rw [induct_lt a_ord_b]
+    apply prev
+    exact as_sort.pop
+    assumption
+  }
+  {
+    intro a as b bs a_ord_b prev
+    intro as_sort bs_sort
+    rw [induct_eq a_ord_b]
+    apply keeps_sorted.helper
+    assumption
+    rw [Compare.ord_to_eq a_ord_b]
+    assumption
+    apply prev
+    exact as_sort.pop
+    exact bs_sort.pop
+  }
+  {
+    intro a as b bs a_ord_b prev
+    intro as_sort bs_sort
+    rw [induct_gt a_ord_b]
+    apply prev
+    assumption
+    exact bs_sort.pop
+  }
+
+#print axioms List.sorted_intersect.keeps_sorted

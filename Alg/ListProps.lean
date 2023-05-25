@@ -26,6 +26,15 @@ def List.sorted.pop [Compare α] (as: List α) (a: α) : (a::as).sorted -> as.so
   | [] => trivial
   | a'::as' => exact aas_sorted.right
 
+def List.sorted.pop_snd [Compare α] (as: List α) (a b: α) : (a::b::as).sorted -> (a::as).sorted := by
+  intro aas_sorted
+  match as with
+  | [] => trivial
+  | a'::as' =>
+    apply And.intro
+    exact Compare.le_trans aas_sorted.left aas_sorted.right.left
+    exact aas_sorted.right.right
+
 def List.any_and_all_not {P: α -> Prop} (list: List α)
   (any: list.anyP P)
   (all_not: list.allP (fun x => ¬ P x)):
