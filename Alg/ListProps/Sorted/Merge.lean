@@ -298,3 +298,17 @@ def List.sorted_merge.contains [Compare α] (as bs: List α) (x: α) : as.contai
     apply List.sorted_merge.keeps_anyP
 
 #print axioms List.sorted_merge.contains
+
+def List.sorted_merge.src_left_sublist [Compare α] {as bs: List α} :
+  as.sublist_of (as.sorted_merge bs) := by
+  intro x con
+  exact List.sorted_merge.contains as bs x (Or.inl con)
+
+#print axioms List.sorted_merge.src_left_sublist
+
+def List.sorted_merge.src_right_sublist [Compare α] {as bs: List α} :
+  bs.sublist_of (as.sorted_merge bs) := by
+  intro x con
+  exact List.sorted_merge.contains as bs x (Or.inr con)
+
+#print axioms List.sorted_merge.src_right_sublist
