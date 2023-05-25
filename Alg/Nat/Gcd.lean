@@ -299,7 +299,7 @@ theorem nat.gcd.of_mul_dvd : ∀ {a b x: nat}, x ∣ (f * a) -> x ∣ (f * b) ->
 
 #print axioms nat.gcd.of_mul_dvd
 
-theorem nat.gcd.mul_left : gcd (x * a) (x * b) = x * gcd a b := by
+theorem nat.gcd.mul_left { a b x } : gcd (x * a) (x * b) = x * gcd a b := by
   apply dvd.to_eq
   {
     apply nat.gcd.of_mul_dvd
@@ -343,3 +343,37 @@ theorem nat.coprime.cancel_right (c: nat.coprime x a) (d: a ∣ b * x) : a ∣ b
   apply nat.coprime.cancel_left c d
 
 #print axioms nat.coprime.cancel_right
+
+theorem nat.gcd.one_left : nat.gcd nat.zero.inc a = nat.zero.inc := by
+  have ⟨ ⟨ _, prf ⟩ , _ ⟩  := gcd.is_dvd nat.zero.inc a
+  have ⟨ _, _ ⟩  := nat.mul_eq_one prf.symm
+  assumption
+
+theorem nat.gcd.one_right : nat.gcd a nat.zero.inc = nat.zero.inc := by
+  have ⟨ _, ⟨ _, prf ⟩ ⟩  := gcd.is_dvd a nat.zero.inc
+  have ⟨ _, _ ⟩  := nat.mul_eq_one prf.symm
+  assumption
+
+theorem nat.gcd.cancel_left (c: nat.coprime x b) : gcd (x * a) b = gcd a b := by
+  have cp_x_gcd : coprime x (gcd (x * a) b) := by 
+    unfold coprime
+    rw [gcd.assoc, dvd.gcd_left (dvd.mul_left _ _)]
+    assumption
+  apply dvd.to_eq
+  have ⟨ l, r ⟩   := gcd.is_dvd (x * a) b
+  apply gcd.of_dvd
+  exact cp_x_gcd.cancel_left l
+  assumption
+  have ⟨ l, r ⟩   := gcd.is_dvd a b
+  apply gcd.of_dvd
+  apply dvd.trans l
+  apply dvd.mul_right
+  assumption
+
+#print axioms nat.gcd.cancel_left
+
+theorem nat.gcd.cancel_right (c: nat.coprime x b) : gcd (a * x) b = gcd a b := by
+  rw [nat.mul_comm]
+  apply cancel_left c
+
+#print axioms nat.gcd.cancel_right

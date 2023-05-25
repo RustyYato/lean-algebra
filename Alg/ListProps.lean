@@ -90,6 +90,22 @@ def List.contains_sorted [Compare α] {x a: α} : (a::as).containsP x -> (a::as)
     apply List.contains_sorted _ as_sort.right
     assumption
 
+def List.not_contains_sorted [Compare α] {x a: α} : x < a -> (a::as).sorted -> ¬(a::as).containsP x := by
+  intro x_lt_a as_sort as_con
+  match as_con.split with
+  | .inl h => 
+    rw [h] at x_lt_a
+    have := Compare.not_lt_id x_lt_a
+    contradiction
+  | .inr h => 
+    match as with
+    | [] => contradiction
+    | a'::as' =>
+    apply List.not_contains_sorted _ as_sort.pop
+    exact h
+    apply Compare.lt_le_trans x_lt_a
+    exact as_sort.left
+
 def List.sublist_of (a b: List α) := ∀x, a.containsP x -> b.containsP x
 
 def List.sublist_of.of_empty {as: List α} : as.sublist_of [] -> as = [] := by
