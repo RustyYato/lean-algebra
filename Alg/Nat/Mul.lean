@@ -85,6 +85,10 @@ def nat.to_mul_irr { a b c: nat } : a = b -> a * c = b * c := by
   intro a_eq_b
   rw [a_eq_b]
 
+def nat.to_mul_irr_left { a b x: nat } : a = b -> x * a = x * b := by
+  intro a_eq_b
+  rw [a_eq_b]
+
 #print axioms nat.to_mul_irr
 
 def nat.of_mul_irr { a b c: nat } : a * c = b * c -> c ≠ .zero -> a = b := fun muldef c_ne_zero => match c with

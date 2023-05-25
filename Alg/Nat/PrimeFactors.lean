@@ -7,6 +7,8 @@ def list_product (list: List nat) := match list with
    | [] => nat.zero.inc
    | x ::xs => x * list_product xs
 
+def list_product.empty : list_product [] = nat.zero.inc := rfl
+
 #print axioms list_product
 
 structure PrimeFactorization (n: nat) where
