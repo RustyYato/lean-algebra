@@ -441,87 +441,6 @@ theorem List.sorted_intersect.induct_gt [Compare α] : ∀{a b: α} {as bs: List
 
 #print axioms List.sorted_intersect.induct_gt
 
-theorem List.sorted_intersect.contains [Compare α] : ∀(as bs: List α) (x: α),
-  as.containsP x ->
-  bs.containsP x ->
-  as.sorted ->
-  bs.sorted ->
-  (as.sorted_intersect bs).containsP x := by
-  apply List.sorted_intersect.induction
-  {
-    intro _
-    intro _ _ _ _ _
-    contradiction
-  }
-  {
-    intro _
-    intro _ _ _ _ _
-    contradiction
-  }
-  {
-    intro a as b bs a_ord_b prev
-    intro x as_con bs_con as_sort bs_sort
-    rw [induct_lt a_ord_b]
-    apply prev
-    match as_con with
-    | .inl h =>
-      simp at h
-      have := List.contains_sorted bs_con bs_sort
-      rw [h] at this
-      have := Compare.not_lt_and_le _ _ a_ord_b
-      contradiction
-    | .inr _ => assumption
-    assumption
-    apply List.sorted.pop
-    repeat assumption
-  }
-  {
-    intro a as b bs a_ord_b prev
-    intro x as_con bs_con as_sort bs_sort
-    rw [induct_eq a_ord_b]
-    match as_con with
-    | .inl h =>
-      rw [h]
-      apply Or.inl
-      rfl
-    | .inr h =>
-      match bs_con with
-      | .inl h =>
-        have a_eq_b := Compare.ord_to_eq a_ord_b
-        rw [a_eq_b, h]
-        apply Or.inl
-        rfl
-      | .inr _ =>
-        apply Or.inr
-        apply prev
-        assumption
-        assumption
-        apply List.sorted.pop
-        assumption
-        apply List.sorted.pop
-        assumption
-  }
-  {
-    intro a as b bs a_ord_b prev
-    intro x as_con bs_con as_sort bs_sort
-    rw [induct_gt a_ord_b]
-    apply prev
-    assumption
-    match bs_con with
-    | .inl h =>
-      simp at h
-      have := List.contains_sorted as_con as_sort
-      rw [h] at this
-      have := Compare.not_lt_and_le _ _ (Compare.flip a_ord_b)
-      contradiction
-    | .inr _ => assumption
-    assumption
-    apply List.sorted.pop
-    repeat assumption
-  }
-
-#print axioms List.sorted_intersect.contains
-
 theorem List.sorted_intersect.keeps_sorted.helper [Compare α] {x: α} : 
   ∀ {as bs},
   sorted (x::as) ->
@@ -619,7 +538,88 @@ theorem List.sorted_intersect.keeps_sorted [Compare α] : ∀(as bs: List α),
 
 #print axioms List.sorted_intersect.keeps_sorted
 
-theorem List.sorted_intersect.contains_inv [Compare α] : ∀(as bs: List α) (x: α),
+theorem List.sorted_intersect.of_contains [Compare α] : ∀(as bs: List α) (x: α),
+  as.containsP x ->
+  bs.containsP x ->
+  as.sorted ->
+  bs.sorted ->
+  (as.sorted_intersect bs).containsP x := by
+  apply List.sorted_intersect.induction
+  {
+    intro _
+    intro _ _ _ _ _
+    contradiction
+  }
+  {
+    intro _
+    intro _ _ _ _ _
+    contradiction
+  }
+  {
+    intro a as b bs a_ord_b prev
+    intro x as_con bs_con as_sort bs_sort
+    rw [induct_lt a_ord_b]
+    apply prev
+    match as_con with
+    | .inl h =>
+      simp at h
+      have := List.contains_sorted bs_con bs_sort
+      rw [h] at this
+      have := Compare.not_lt_and_le _ _ a_ord_b
+      contradiction
+    | .inr _ => assumption
+    assumption
+    apply List.sorted.pop
+    repeat assumption
+  }
+  {
+    intro a as b bs a_ord_b prev
+    intro x as_con bs_con as_sort bs_sort
+    rw [induct_eq a_ord_b]
+    match as_con with
+    | .inl h =>
+      rw [h]
+      apply Or.inl
+      rfl
+    | .inr h =>
+      match bs_con with
+      | .inl h =>
+        have a_eq_b := Compare.ord_to_eq a_ord_b
+        rw [a_eq_b, h]
+        apply Or.inl
+        rfl
+      | .inr _ =>
+        apply Or.inr
+        apply prev
+        assumption
+        assumption
+        apply List.sorted.pop
+        assumption
+        apply List.sorted.pop
+        assumption
+  }
+  {
+    intro a as b bs a_ord_b prev
+    intro x as_con bs_con as_sort bs_sort
+    rw [induct_gt a_ord_b]
+    apply prev
+    assumption
+    match bs_con with
+    | .inl h =>
+      simp at h
+      have := List.contains_sorted as_con as_sort
+      rw [h] at this
+      have := Compare.not_lt_and_le _ _ (Compare.flip a_ord_b)
+      contradiction
+    | .inr _ => assumption
+    assumption
+    apply List.sorted.pop
+    repeat assumption
+  }
+
+#print axioms List.sorted_intersect.of_contains
+
+theorem List.sorted_intersect.to_contains [Compare α] : ∀(as bs: List α) (x: α),
   as.sorted ->
   bs.sorted ->
   (as.sorted_intersect bs).containsP x ->
@@ -672,4 +672,4 @@ theorem List.sorted_intersect.contains_inv [Compare α] : ∀(as bs: List α) (x
     assumption
   }
 
-#print axioms List.sorted_intersect.contains_inv
+#print axioms List.sorted_intersect.to_contains
