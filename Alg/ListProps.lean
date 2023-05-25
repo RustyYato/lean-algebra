@@ -169,6 +169,21 @@ def List.sublist_of.push_right {b: α} {as bs: List α}: as.sublist_of bs -> as.
 
 #print axioms List.sublist_of.push_right
 
+def List.sublist_of.push {x: α} {as bs: List α} : as.sublist_of bs -> (x::as).sublist_of (x::bs) := by
+  intro sub
+  intro y cona
+  match cona with
+  | .inl h => rw [h]; apply Or.inl; rfl
+  | .inr h => apply Or.inr; apply sub; assumption
+
+#print axioms List.sublist_of.push_left
+
+def List.sublist_of.id {as: List α} : as.sublist_of as := by
+  intro x con
+  assumption
+
+#print axioms List.sublist_of.of_empty
+
 def List.containsP.allP {as: List α} : ∀{x}, as.containsP x -> as.allP P -> P x := by
   intro x con all
   match as with

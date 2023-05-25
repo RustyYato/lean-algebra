@@ -52,3 +52,130 @@ theorem List.sorted_difference.induct_gt [Compare α] : ∀{a b: α} {as bs: Lis
 
 #print axioms List.sorted_difference.induct_gt
 
+def List.sorted_difference.sublist_of [Compare α] : ∀{as bs: List α},
+  (as.sorted_difference bs).sublist_of as := by
+  apply sorted.induction
+  {
+    intro bs
+    rw [empty_left]
+    exact List.sublist_of.empty
+  }
+  {
+    intro a as
+    rw [empty_right]
+    exact List.sublist_of.id
+  }
+  {
+    intro a as b bs a_ord_b prev
+    rw [induct_lt a_ord_b]
+    apply List.sublist_of.push
+    assumption
+  }
+  {
+    intro a as b bs a_ord_b prev
+    rw [induct_eq a_ord_b]
+    apply List.sublist_of.push_right
+    assumption
+  }
+  {
+    intro a as b bs a_ord_b prev
+    rw [induct_gt a_ord_b]
+    assumption
+  }
+
+theorem List.sorted_difference.keeps_sorted.helper [Compare α] {x: α} : 
+  ∀ {as bs},
+  sorted (x::as) ->
+  sorted (x::bs) ->
+  sorted (sorted_difference as bs) ->
+  sorted (x :: sorted_difference as bs) := by
+  apply sorted.induction
+  {
+    intro _
+    intro _ _ _
+    rw [empty_left]
+    assumption
+  }
+  {
+    intro _ _
+    intro _ _ _
+    rw [empty_right]
+    assumption
+  }
+  {
+    intro a as b bs a_ord_b _
+    intro as_sort _ i_sort
+    rw [induct_lt a_ord_b]
+    rw [induct_lt a_ord_b] at i_sort
+    apply And.intro
+    exact as_sort.left
+    assumption
+  }
+  {
+    intro a as b bs a_ord_b prev
+    intro as_sort bs_sort i_sort
+    rw [induct_eq a_ord_b]
+    rw [induct_eq a_ord_b] at i_sort
+    apply prev
+    exact as_sort.pop_snd
+    exact bs_sort.pop_snd
+    assumption
+  }
+  {
+    intro a as b bs a_ord_b prev
+    intro as_sort bs_sort i_sort
+    rw [induct_gt a_ord_b]
+    rw [induct_gt a_ord_b] at i_sort
+    apply prev
+    assumption
+    exact bs_sort.pop_snd
+    assumption
+  }
+
+def List.sorted_difference.keeps_sorted [Compare α] : ∀{as bs: List α},
+  as.sorted ->
+  bs.sorted ->
+  (as.sorted_difference bs).sorted := by
+  apply sorted.induction
+  {
+    intro bs
+    intro as_sort _
+    rw [empty_left]
+    assumption
+  }
+  {
+    intro a as
+    intro as_sort _
+    rw [empty_right]
+    assumption
+  }
+  {
+    intro a as b bs a_ord_b prev
+    intro as_sort bs_sort
+    rw [induct_lt a_ord_b]
+    apply keeps_sorted.helper
+    assumption
+    apply And.intro
+    apply Or.inl
+    assumption
+    assumption
+    apply prev
+    exact as_sort.pop
+    assumption
+  }
+  {
+    intro a as b bs a_ord_b prev
+    intro as_sort bs_sort
+    rw [induct_eq a_ord_b]
+    apply prev
+    exact as_sort.pop
+    exact bs_sort.pop
+  }
+  {
+    intro a as b bs a_ord_b prev
+    intro as_sort bs_sort
+    rw [induct_gt a_ord_b]
+    apply prev
+    assumption
+    exact bs_sort.pop
+  }
