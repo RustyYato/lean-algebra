@@ -54,4 +54,27 @@ instance List.dec_containsP [DecidableEq α] (as: List α) (x: α) : Decidable (
         | .inl x_eq => h x_eq
         | .inr as'_con => not_as'_con as'_con)
 
+instance List.dec_sorted [Compare α] (as: List α) : Decidable (as.sorted) := 
+  match as with
+  | [] | [_] => Decidable.isTrue True.intro
+  | a::b::xs => by
+    apply dec_and
+    apply Compare.dec_le
+    apply List.dec_sorted
+
 #print axioms List.dec_containsP
+
+def List.contains_sorted [Compare α] {x a: α} : (a::as).containsP x -> (a::as).sorted -> a <= x := by
+  intro as_con as_sort
+  unfold containsP anyP at as_con
+  match as_con with
+  | .inl h => 
+    rw [h]
+    apply Compare.le_id
+  | .inr h => 
+    match as with
+    | [] => contradiction
+    | a'::as' =>
+    apply Compare.le_trans as_sort.left
+    apply List.contains_sorted _ as_sort.right
+    assumption

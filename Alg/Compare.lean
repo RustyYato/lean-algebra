@@ -249,6 +249,25 @@ def dec_or : Decidable A -> Decidable B -> Decidable (A ∨ B) := by
 
 #print axioms dec_or
 
+def dec_and: Decidable A -> Decidable B -> Decidable (A ∧ B) := by
+  intro deca decb
+  cases deca <;> cases decb
+  apply Decidable.isFalse
+  intro a_or_b
+  cases a_or_b <;> contradiction
+  apply Decidable.isFalse
+  intro a_and_b
+  have := a_and_b.left
+  contradiction
+  apply Decidable.isFalse
+  intro a_and_b
+  have := a_and_b.right
+  contradiction
+  apply Decidable.isTrue
+  apply And.intro <;> assumption
+
+#print axioms dec_and
+
 instance Order.dec_eq (a b: Order) : Decidable (a = b) := match a, b with
 | .Less, .Less | .Eq, .Eq | .Greater, .Greater => Decidable.isTrue rfl
 | .Less, .Eq | .Eq, .Less | .Greater, .Less
