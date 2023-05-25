@@ -181,13 +181,13 @@ theorem List.sorted_intersect.induction.unfuel
 def List.sorted_intersect [Compare α] : List α -> List α -> List α := by
   apply List.sorted_intersect.induction
   {
-    intro bs
-    exact bs
+    intro _
+    exact []
   }
 
   {
-    intro as
-    exact as
+    intro _
+    exact []
   }
 
   {
@@ -204,3 +204,255 @@ def List.sorted_intersect [Compare α] : List α -> List α -> List α := by
     intro a _ b _ _ prev
     exact prev
   }
+
+#print axioms List.sorted_intersect
+
+#eval [0, 1, 2].sorted_intersect [0, 2]
+
+#eval [0, 1, 2].containsP 2
+#eval [2].containsP 2
+
+def list_a := [0, 1, 2]
+def list_b := [0, 2]
+def list_c := list_a.sorted_intersect list_b
+def elem_x := 2
+
+#eval list_c
+
+#eval list_a.containsP elem_x
+#eval list_b.containsP elem_x
+#eval list_c.containsP elem_x
+
+theorem List.sorted_intersect.empty_left [Compare α] : ∀{as bs: List α}, as = [] -> as.sorted_intersect bs = [] := by
+  apply List.sorted_intersect.induction
+
+  {
+    intro bs _
+    match bs with
+    | [] => rfl
+    | b::bs' => rfl
+  }
+
+  {
+    intro _ as_is_empty
+    rw [as_is_empty]
+    rfl
+  }
+
+  repeat {
+    intro _ _ _ _ _ _ _
+    contradiction
+  }
+
+#print axioms List.sorted_intersect.empty_left
+
+theorem List.sorted_intersect.empty_right [Compare α] : ∀{as bs: List α}, bs = [] -> as.sorted_intersect bs = [] := by
+  apply List.sorted_intersect.induction
+
+
+  {
+    intro _ bs_is_empty
+    rw [bs_is_empty]
+    rfl
+  }
+
+  {
+    intro as _
+    match as with
+    | [] => rfl
+    | a::as' => rfl
+  }
+
+  repeat {
+    intro _ _ _ _ _ _ _
+    contradiction
+  }
+
+#print axioms List.sorted_intersect.empty_right
+
+theorem List.sorted_intersect.induct_lt.helper [Compare α] : ∀(as bs cs ds: List α) (c d: α), as = c::cs -> bs = d::ds -> c < d -> as.sorted_intersect bs = cs.sorted_intersect bs := by
+  apply List.sorted_intersect.induction
+
+  {
+    intro bs
+    intro cs ds c d as_eq_cs _ _
+    contradiction
+  }
+
+  {
+    intro as
+    intro cs ds c d _ bs_eq_ds _
+    contradiction
+  }
+
+  {
+    intro a as b bs a_ord_b _
+    intro cs ds c d as_eq_cs bs_eq_ds _
+    have ⟨ a_eq_c, as_eq_cs ⟩  := List.cons.inj as_eq_cs
+    have ⟨ b_eq_d, bs_eq_ds ⟩  := List.cons.inj bs_eq_ds
+    conv => {
+      lhs
+      unfold sorted_intersect induction induction.bounded
+    }
+    simp
+    rw [a_ord_b]
+    simp
+    rw [a_eq_c, b_eq_d]
+    rw [as_eq_cs, bs_eq_ds]
+    simp
+    rfl
+  }
+
+  {
+    intro a as b bs a_ord_b _
+    intro cs ds c d as_eq_cs bs_eq_ds c_lt_d
+    have ⟨ a_eq_c, as_eq_cs ⟩  := List.cons.inj as_eq_cs
+    have ⟨ b_eq_d, bs_eq_ds ⟩  := List.cons.inj bs_eq_ds
+    rw [a_eq_c, b_eq_d] at a_ord_b
+    rw [c_lt_d] at a_ord_b
+    contradiction
+  }
+
+  {
+    intro a as b bs a_ord_b _
+    intro cs ds c d as_eq_cs bs_eq_ds c_lt_d
+    have ⟨ a_eq_c, as_eq_cs ⟩  := List.cons.inj as_eq_cs
+    have ⟨ b_eq_d, bs_eq_ds ⟩  := List.cons.inj bs_eq_ds
+    rw [a_eq_c, b_eq_d] at a_ord_b
+    rw [c_lt_d] at a_ord_b
+    contradiction
+  }
+
+theorem List.sorted_intersect.induct_lt [Compare α] : ∀(a b: α) (as bs: List α), a < b -> (a::as).sorted_intersect (b::bs) = as.sorted_intersect (b::bs) := by
+  intro a b as bs 
+  apply List.sorted_intersect.induct_lt.helper 
+  rfl
+  rfl
+
+#print axioms List.sorted_intersect.induct_lt
+
+theorem List.sorted_intersect.induct_eq.helper [Compare α] : ∀(as bs cs ds: List α) (c d: α), as = c::cs -> bs = d::ds -> Compare.ord c d = Order.Eq -> as.sorted_intersect bs = c::(cs.sorted_intersect ds) := by
+  apply List.sorted_intersect.induction
+
+  {
+    intro bs
+    intro cs ds c d as_eq_cs _ _
+    contradiction
+  }
+
+  {
+    intro as
+    intro cs ds c d _ bs_eq_ds _
+    contradiction
+  }
+
+  {
+    intro a as b bs a_ord_b _
+    intro cs ds c d as_eq_cs bs_eq_ds c_lt_d
+    have ⟨ a_eq_c, as_eq_cs ⟩  := List.cons.inj as_eq_cs
+    have ⟨ b_eq_d, bs_eq_ds ⟩  := List.cons.inj bs_eq_ds
+    rw [a_eq_c, b_eq_d] at a_ord_b
+    rw [c_lt_d] at a_ord_b
+    contradiction
+  }
+
+  {
+    intro a as b bs a_ord_b _
+    intro cs ds c d as_eq_cs bs_eq_ds _
+    have ⟨ a_eq_c, as_eq_cs ⟩  := List.cons.inj as_eq_cs
+    have ⟨ b_eq_d, bs_eq_ds ⟩  := List.cons.inj bs_eq_ds
+    conv => {
+      lhs
+      unfold sorted_intersect induction induction.bounded
+    }
+    simp
+    rw [a_ord_b]
+    simp
+    rw [a_eq_c, b_eq_d]
+    rw [as_eq_cs, bs_eq_ds]
+    simp
+    unfold sorted_intersect induction
+    rw [induction.bounded.fuel_irr]
+    rfl
+  }
+
+  {
+    intro a as b bs a_ord_b _
+    intro cs ds c d as_eq_cs bs_eq_ds c_lt_d
+    have ⟨ a_eq_c, as_eq_cs ⟩  := List.cons.inj as_eq_cs
+    have ⟨ b_eq_d, bs_eq_ds ⟩  := List.cons.inj bs_eq_ds
+    rw [a_eq_c, b_eq_d] at a_ord_b
+    rw [c_lt_d] at a_ord_b
+    contradiction
+  }
+
+theorem List.sorted_intersect.induct_eq [Compare α] : ∀(a b: α) (as bs: List α), Compare.ord a b = Order.Eq -> (a::as).sorted_intersect (b::bs) = a::(as.sorted_intersect bs) := by
+  intro a b as bs 
+  apply List.sorted_intersect.induct_eq.helper
+  rfl
+  rfl
+
+#print axioms List.sorted_intersect.induct_eq
+
+theorem List.sorted_intersect.induct_gt.helper [Compare α] : ∀(as bs cs ds: List α) (c d: α), as = c::cs -> bs = d::ds -> c > d -> as.sorted_intersect bs = as.sorted_intersect ds := by
+  apply List.sorted_intersect.induction
+
+  {
+    intro bs
+    intro cs ds c d as_eq_cs _ _
+    contradiction
+  }
+
+  {
+    intro as
+    intro cs ds c d _ bs_eq_ds _
+    contradiction
+  }
+
+  {
+    intro a as b bs a_ord_b _
+    intro cs ds c d as_eq_cs bs_eq_ds c_gt_d
+    have ⟨ a_eq_c, as_eq_cs ⟩  := List.cons.inj as_eq_cs
+    have ⟨ b_eq_d, bs_eq_ds ⟩  := List.cons.inj bs_eq_ds
+    rw [a_eq_c, b_eq_d] at a_ord_b
+    rw [Compare.flip c_gt_d] at a_ord_b
+    contradiction
+  }
+
+  {
+    intro a as b bs a_ord_b _
+    intro cs ds c d as_eq_cs bs_eq_ds c_gt_d
+    have ⟨ a_eq_c, as_eq_cs ⟩  := List.cons.inj as_eq_cs
+    have ⟨ b_eq_d, bs_eq_ds ⟩  := List.cons.inj bs_eq_ds
+    rw [a_eq_c, b_eq_d] at a_ord_b
+    rw [Compare.flip c_gt_d] at a_ord_b
+    contradiction
+  }
+
+  {
+    intro a as b bs a_ord_b _
+    intro cs ds c d as_eq_cs bs_eq_ds _
+    have ⟨ a_eq_c, as_eq_cs ⟩  := List.cons.inj as_eq_cs
+    have ⟨ b_eq_d, bs_eq_ds ⟩  := List.cons.inj bs_eq_ds
+    conv => {
+      lhs
+      unfold sorted_intersect induction induction.bounded
+    }
+    simp
+    rw [a_ord_b]
+    simp
+    rw [a_eq_c, b_eq_d]
+    rw [as_eq_cs, bs_eq_ds]
+    simp
+    unfold sorted_intersect induction
+    rw [induction.bounded.fuel_irr]
+    rfl
+  }
+
+theorem List.sorted_intersect.induct_gt [Compare α] : ∀(a b: α) (as bs: List α), a > b -> (a::as).sorted_intersect (b::bs) = (a::as).sorted_intersect bs := by
+  intro a b as bs 
+  apply List.sorted_intersect.induct_gt.helper
+  rfl
+  rfl
+
+#print axioms List.sorted_intersect.induct_gt

@@ -350,3 +350,75 @@ def Compare.le_to_eq {{ α: Sort _ }} [Compare α] (a b: α) :
     | .inl h => (Compare.not_lt_and_le _ _ h b_le_a).elim
     | .inr h => Compare.ord_to_eq h
       
+
+def Nat.ord (a b: Nat) :=
+  match a with
+  | .zero => match b with
+    | .zero => Order.Eq
+    | .succ _ => Order.Greater
+  | .succ a => match b with
+    | .zero => Order.Less
+    | .succ b => Nat.ord a b
+
+def Nat.ord_flip (a b: Nat) : Nat.ord a b = (Nat.ord b a).flip := by
+  match a with
+  | .zero => match b with
+    | .zero => rfl
+    | .succ _ => rfl
+  | .succ a => match b with
+    | .zero => rfl
+    | .succ b =>
+      simp
+      unfold ord
+      simp
+      rw [Nat.ord_flip a b] 
+      rfl
+
+def Nat.ord_transitive {a b c: Nat} {o: Order} : Nat.ord a b = o -> Nat.ord b c = o -> Nat.ord a c = o := by
+  intro ord_ab ord_bc
+  cases a <;> cases b <;> cases c
+  any_goals assumption
+  
+  unfold ord at ord_ab ord_bc
+  simp at ord_ab ord_bc
+  rw [←ord_ab] at ord_bc
+  contradiction
+  
+  unfold ord at ord_ab ord_bc
+  simp at ord_ab ord_bc
+  rw [←ord_ab] at ord_bc
+  contradiction
+
+  unfold ord at ord_ab ord_bc
+  simp at ord_ab ord_bc
+  unfold ord; simp
+  apply Nat.ord_transitive ord_ab ord_bc
+
+def Nat.ord_to_eq {a b: Nat} : Nat.ord a b = Order.Eq -> a = b := by
+  intro ord_ab
+  cases a <;> cases b
+  rfl
+  contradiction
+  contradiction
+  congr
+  unfold ord at ord_ab
+  simp at ord_ab
+  exact Nat.ord_to_eq ord_ab
+
+instance : Compare Nat where
+  ord := Nat.ord
+
+  ord_id := by
+    intro a
+    unfold Nat.ord
+    induction a with
+    | zero => simp
+    | succ a' ih =>
+      simp
+      simp at ih
+      unfold Nat.ord
+      assumption
+  
+  ord_flip := Nat.ord_flip
+  ord_transitive := Nat.ord_transitive
+  ord_to_eq := Nat.ord_to_eq

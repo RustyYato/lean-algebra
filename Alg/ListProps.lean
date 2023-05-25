@@ -42,3 +42,16 @@ def List.allP.map {P Q: α -> Prop} {list: List α}
   | [] => True.intro
   | _::_ => 
     ⟨ (p_to_q all.left), all.right.map p_to_q ⟩
+
+instance List.dec_containsP [DecidableEq α] (as: List α) (x: α) : Decidable (List.containsP as x) := 
+  match as with
+  | [] => Decidable.isFalse False.elim
+  | a::as' =>
+    if h:x = a then Decidable.isTrue (Or.inl h)
+    else match List.dec_containsP as' x with
+      | .isTrue as'_con => Decidable.isTrue (Or.inr as'_con)
+      | .isFalse not_as'_con => Decidable.isFalse (fun x_eq_or_as'_con => match x_eq_or_as'_con with
+        | .inl x_eq => h x_eq
+        | .inr as'_con => not_as'_con as'_con)
+
+#print axioms List.dec_containsP
