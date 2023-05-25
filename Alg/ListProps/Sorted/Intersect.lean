@@ -618,3 +618,58 @@ theorem List.sorted_intersect.keeps_sorted [Compare α] : ∀(as bs: List α),
   }
 
 #print axioms List.sorted_intersect.keeps_sorted
+
+theorem List.sorted_intersect.contains_inv [Compare α] : ∀(as bs: List α) (x: α),
+  as.sorted ->
+  bs.sorted ->
+  (as.sorted_intersect bs).containsP x ->
+  as.containsP x ∧ bs.containsP x 
+   := by
+  apply List.sorted_intersect.induction
+  {
+    intro _
+    intro _ _ _ i_con
+    rw [empty_left rfl] at i_con
+    contradiction
+  }
+  {
+    intro _
+    intro _ _ _ i_con
+    rw [empty_right rfl] at i_con
+    contradiction
+  }
+  {
+    intro a as b bs a_ord_b prev
+    intro x as_sort bs_sort i_con
+    rw [induct_lt a_ord_b] at i_con
+    have ⟨ a_con, b_con ⟩  := prev x as_sort.pop bs_sort i_con
+    apply And.intro
+    apply Or.inr
+    repeat assumption
+  }
+  {
+    intro a as b bs a_ord_b prev
+    intro x as_sort bs_sort i_con
+    rw [induct_eq a_ord_b] at i_con
+    match i_con with
+    | .inl found =>
+      apply And.intro <;> apply Or.inl
+      exact found
+      rw [←Compare.ord_to_eq a_ord_b]
+      exact found
+    | .inr i_con =>
+    have ⟨ a_con, b_con ⟩  := prev x as_sort.pop bs_sort.pop i_con
+    apply And.intro <;> (apply Or.inr; assumption)
+  }
+  {
+    intro a as b bs a_ord_b prev
+    intro x as_sort bs_sort i_con
+    rw [induct_gt a_ord_b] at i_con
+    have ⟨ a_con, b_con ⟩  := prev x as_sort bs_sort.pop i_con
+    apply And.intro
+    assumption
+    apply Or.inr
+    assumption
+  }
+
+#print axioms List.sorted_intersect.contains_inv
