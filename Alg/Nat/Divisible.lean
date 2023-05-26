@@ -29,8 +29,6 @@ theorem dvd.mul_right (a b: nat) : b ∣ a * b := ⟨ a, nat.mul_comm a b ⟩
 
 #print axioms dvd.mul_right
 
--- theorem dvd.of_mul_com_left (x a b: nat) : x * a ∣ x * b -> a ∣ b := ⟨ b, rfl ⟩
-
 theorem dvd.to_mul_com_left (x a b: nat) : a ∣ b -> x * a ∣ x * b := fun ⟨ y, prfy ⟩ => ⟨ y, by rw [prfy, nat.mul_perm_a_bc_to_ab_c] ⟩
 
 #print axioms dvd.to_mul_com_left

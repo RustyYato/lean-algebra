@@ -325,7 +325,7 @@ instance Compare.dec_ge [Compare α] (a b: α) : Decidable (a >= b) := by
 
 #print axioms Compare.dec_gt
 
-theorem Compare.not_lt_and_le [Compare α] (a b: α) : a < b -> b <= a -> False := by
+theorem Compare.not_lt_and_le [Compare α] {a b: α} : a < b -> b <= a -> False := by
   intro a_lt_b b_le_a
   unfold LT.lt ord_lt at a_lt_b
   simp at a_lt_b
@@ -366,7 +366,7 @@ theorem Compare.not_lt_id [Compare α] {a: α} : ¬a < a := by
 
 def Compare.le_to_eq {{ α: Sort _ }} [Compare α] (a b: α) :
   a <= b -> b <= a -> a = b := fun a_le_b b_le_a => match a_le_b with
-    | .inl h => (Compare.not_lt_and_le _ _ h b_le_a).elim
+    | .inl h => (Compare.not_lt_and_le h b_le_a).elim
     | .inr h => Compare.ord_to_eq h
       
 

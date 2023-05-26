@@ -262,6 +262,19 @@ def list_product.eq_zero : nat.zero = list_product ns -> ns.containsP nat.zero :
 
 #print axioms list_product.eq_zero
 
+def list_product.eq_one : nat.zero.inc = list_product ns -> ns.allP (fun x => x = nat.zero.inc) := by
+  intro x_eq_one
+  match ns with
+  | [] => trivial
+  | x::xs =>
+  have ⟨ l, r ⟩ := nat.mul_eq_one x_eq_one.symm
+  apply And.intro
+  rw [l]
+  apply list_product.eq_one
+  exact r.symm
+
+#print axioms list_product.eq_zero
+
 theorem no_factorization_for_zero: PrimeFactorization nat.zero -> False := by
   intro f
   have := list_product.eq_zero f.eq_n

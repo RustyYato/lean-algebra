@@ -122,7 +122,7 @@ theorem nat.divide.base { a b : nat } (a_lt_b: a < b) (b_nz: b ≠ .zero) : a / 
   unfold divrem.calc divrem.induction.bounded
   split
   rfl
-  have := (Compare.not_lt_and_le _ _ a_lt_b)
+  have := (Compare.not_lt_and_le a_lt_b)
   contradiction
 
 #print axioms nat.divide.base
@@ -138,7 +138,7 @@ theorem nat.remainder.base { a b : nat } (a_lt_b: a < b) (b_nz: b ≠ .zero) : a
   unfold divrem.calc divrem.induction.bounded
   split
   rfl
-  have := (Compare.not_lt_and_le _ _ a_lt_b)
+  have := (Compare.not_lt_and_le a_lt_b)
   contradiction
 
 #print axioms nat.remainder.base
@@ -153,7 +153,7 @@ theorem nat.divide.induct { a b : nat } (b_le_a: b <= a) (b_nz: b ≠ .zero) : a
   simp
   unfold divrem.calc divrem.induction.bounded
   split
-  have := (Compare.not_lt_and_le _ _ · b_le_a)
+  have := (Compare.not_lt_and_le · b_le_a)
   contradiction
   rw [divrem.calc.of_bounded, nat.divide.of_calc]
 
@@ -169,7 +169,7 @@ theorem nat.remainder.induct { a b : nat } (b_le_a: b <= a) (b_nz: b ≠ .zero) 
   simp
   unfold divrem.calc divrem.induction.bounded
   split
-  have := (Compare.not_lt_and_le _ _ · b_le_a)
+  have := (Compare.not_lt_and_le · b_le_a)
   contradiction
   simp
   rw [divrem.calc.of_bounded, nat.remainder.of_calc]
@@ -220,7 +220,7 @@ theorem nat.from_div_def : ∀a b: nat, b ≠ .zero -> ∀ q r, r < b -> a = b *
     | .zero =>
       rw [nat.mul_zero_right, nat.add_zero_left] at divdef
       rw [←divdef] at r_lt_b
-      have := Compare.not_lt_and_le _ _ r_lt_b b_le_a
+      have := Compare.not_lt_and_le r_lt_b b_le_a
       contradiction
     | .inc q₀ =>
       have ⟨ qdef, rdef ⟩  := prev q₀ r r_lt_b (by

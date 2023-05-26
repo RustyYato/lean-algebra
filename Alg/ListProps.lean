@@ -47,6 +47,14 @@ def List.any_and_all_not {P: α -> Prop} (list: List α)
      | .inl px => all_not.left px
      | .inr pxs => xs.any_and_all_not pxs all_not.right
 
+def List.allP.and_all_not {P: α -> Prop} {list: List α}
+  (all: list.allP P)
+  (all_not: list.allP (fun x => ¬ P x)):
+  list = []
+   := match list with
+  | [] => rfl
+  | _::_ => (all_not.left all.left).elim
+
 def List.allP.map {P Q: α -> Prop} {list: List α}
   (all: list.allP P): (∀{x}, P x -> Q x) -> list.allP Q
    := fun p_to_q => match list with
@@ -75,8 +83,8 @@ instance List.dec_sorted [Compare α] (as: List α) : Decidable (as.sorted) :=
 
 #print axioms List.dec_containsP
 
-def List.contains_sorted [Compare α] {x a: α} : (a::as).containsP x -> (a::as).sorted -> a <= x := by
-  intro as_con as_sort
+def List.sorted.contains [Compare α] {x a: α} : (a::as).sorted -> (a::as).containsP x -> a <= x := by
+  intro as_sort as_con
   unfold containsP anyP at as_con
   match as_con with
   | .inl h => 
@@ -87,11 +95,11 @@ def List.contains_sorted [Compare α] {x a: α} : (a::as).containsP x -> (a::as)
     | [] => contradiction
     | a'::as' =>
     apply Compare.le_trans as_sort.left
-    apply List.contains_sorted _ as_sort.right
+    apply as_sort.right.contains
     assumption
 
-def List.not_contains_sorted [Compare α] {x a: α} : x < a -> (a::as).sorted -> ¬(a::as).containsP x := by
-  intro x_lt_a as_sort as_con
+def List.sorted.not_contains [Compare α] {x a: α} : List.sorted (a::as) -> x < a -> ¬(a::as).containsP x := by
+  intro as_sort x_lt_a as_con
   match as_con.split with
   | .inl h => 
     rw [h] at x_lt_a
@@ -101,10 +109,10 @@ def List.not_contains_sorted [Compare α] {x a: α} : x < a -> (a::as).sorted ->
     match as with
     | [] => contradiction
     | a'::as' =>
-    apply List.not_contains_sorted _ as_sort.pop
-    exact h
+    apply (as_sort.pop).not_contains 
     apply Compare.lt_le_trans x_lt_a
     exact as_sort.left
+    exact h
 
 def List.subset_of (a b: List α) := ∀x, a.containsP x -> b.containsP x
 

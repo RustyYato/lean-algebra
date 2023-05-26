@@ -11,7 +11,7 @@ def smallest_factor_from (fuel x n: nat): n < fuel + x -> x <= n -> x ≠ .zero 
   match fuel with
   | .zero =>
     rw [nat.add_zero_left] at n_lt_fuel_add_x
-    have := Compare.not_lt_and_le _ _ n_lt_fuel_add_x x_le_n
+    have := Compare.not_lt_and_le n_lt_fuel_add_x x_le_n
     contradiction
   | .inc fuel =>
     match @dvd.dec x n x_nz with
@@ -57,7 +57,7 @@ theorem smallest_factor_from.prf (n: nat) :
   unfold smallest_factor_from
   match fuel with
   | .zero =>
-    have := Compare.not_lt_and_le _ _ h₀
+    have := Compare.not_lt_and_le h₀
     contradiction
   | .inc fuel =>
     simp
@@ -95,7 +95,7 @@ theorem smallest_factor_from.ge_start (n: nat) :
   unfold smallest_factor_from
   match fuel with
   | .zero =>
-    have := Compare.not_lt_and_le _ _ h₀
+    have := Compare.not_lt_and_le h₀
     contradiction
   | .inc fuel =>
     simp
@@ -115,7 +115,7 @@ theorem smallest_factor_from.is_dvd (n: nat) :
   unfold smallest_factor_from
   match fuel with
   | .zero =>
-    have := Compare.not_lt_and_le _ _ h₀
+    have := Compare.not_lt_and_le h₀
     contradiction
   | .inc fuel =>
     simp
@@ -250,3 +250,21 @@ theorem smallest_factor.prime (n: nat) : nat.zero.inc < n -> n.smallest_factor.p
   }
 
 #print axioms smallest_factor.prime
+
+def nat.prime.ne_zero (p: nat.prime n) : n ≠ nat.zero := by
+  intro n_eq_zero
+  match p.right nat.zero.inc.inc with
+    | .inl h =>
+      rw [n_eq_zero] at h
+      exact h (dvd.zero _)
+    | .inr (.inl h) =>
+      rw [n_eq_zero] at h
+      exact nat.noConfusion h
+    | .inr (.inr h) => 
+      contradiction
+
+#print axioms nat.prime.ne_zero
+
+def nat.prime.ne_one (p: nat.prime n) : n ≠ nat.zero.inc := p.left
+
+#print axioms nat.prime.ne_one

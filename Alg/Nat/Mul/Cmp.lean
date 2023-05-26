@@ -103,7 +103,7 @@ theorem nat.of_le_mul_left_irr : x ≠ .zero -> ∀{a b: nat}, x * a <= x * b ->
   apply Compare.le_id
   apply nat.zero_le _
   rw [nat.mul_zero_right] at a_lt_b
-  have := (Compare.not_lt_and_le _ _ · a_lt_b) (@nat.zero_lt_mul_inc_inc x₀ _)
+  have := (Compare.not_lt_and_le · a_lt_b) (@nat.zero_lt_mul_inc_inc x₀ _)
   contradiction
   apply nat.to_le_inc_irr
   rw [nat.mul_inc_right, nat.mul_inc_right] at a_lt_b
