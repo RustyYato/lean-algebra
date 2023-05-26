@@ -105,8 +105,8 @@ theorem PrimeFactorization.intersect
   (fb: PrimeFactorization b):
   PrimeFactorization (a.gcd b) := by
   apply PrimeFactorization.mk (fa.factors.sorted_intersect fb.factors)
-  apply List.sublist_of.allP
-  apply List.sorted_intersect.sublist_of_left
+  apply List.subset_of.allP
+  apply List.sorted_intersect.subset_of_left
   exact fa.sorted
   exact fb.sorted
   exact fa.all_primes

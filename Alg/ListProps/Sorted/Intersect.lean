@@ -289,20 +289,20 @@ theorem List.sorted_intersect.to_contains [Compare α] : ∀(as bs: List α) (x:
 
 #print axioms List.sorted_intersect.to_contains
 
-theorem List.sorted_intersect.sublist_of_left [Compare α] : ∀{as bs: List α},
+theorem List.sorted_intersect.subset_of_left [Compare α] : ∀{as bs: List α},
   as.sorted ->
   bs.sorted ->
-  (as.sorted_intersect bs).sublist_of as := by
+  (as.sorted_intersect bs).subset_of as := by
   intro as bs as_sort bs_sort x con
   exact (List.sorted_intersect.to_contains as bs x as_sort bs_sort con).left
 
-#print axioms List.sorted_intersect.sublist_of_left
+#print axioms List.sorted_intersect.subset_of_left
 
-theorem List.sorted_intersect.sublist_of_right [Compare α] : ∀{as bs: List α},
+theorem List.sorted_intersect.subset_of_right [Compare α] : ∀{as bs: List α},
   as.sorted ->
   bs.sorted ->
-  (as.sorted_intersect bs).sublist_of as := by
+  (as.sorted_intersect bs).subset_of as := by
   intro as bs as_sort bs_sort x con
   exact (List.sorted_intersect.to_contains as bs x as_sort bs_sort con).left
 
-#print axioms List.sorted_intersect.sublist_of_right
+#print axioms List.sorted_intersect.subset_of_right

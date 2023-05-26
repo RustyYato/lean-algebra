@@ -52,29 +52,29 @@ theorem List.sorted_difference.induct_gt [Compare α] : ∀{a b: α} {as bs: Lis
 
 #print axioms List.sorted_difference.induct_gt
 
-def List.sorted_difference.sublist_of [Compare α] : ∀{as bs: List α},
-  (as.sorted_difference bs).sublist_of as := by
+def List.sorted_difference.subset_of [Compare α] : ∀{as bs: List α},
+  (as.sorted_difference bs).subset_of as := by
   apply sorted.induction
   {
     intro bs
     rw [empty_left]
-    exact List.sublist_of.empty
+    exact List.subset_of.empty
   }
   {
     intro a as
     rw [empty_right]
-    exact List.sublist_of.id
+    exact List.subset_of.id
   }
   {
     intro a as b bs a_ord_b prev
     rw [induct_lt a_ord_b]
-    apply List.sublist_of.push
+    apply List.subset_of.push
     assumption
   }
   {
     intro a as b bs a_ord_b prev
     rw [induct_eq a_ord_b]
-    apply List.sublist_of.push_right
+    apply List.subset_of.push_right
     assumption
   }
   {
