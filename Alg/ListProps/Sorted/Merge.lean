@@ -312,3 +312,75 @@ def List.sorted_merge.src_right_subset [Compare α] {as bs: List α} :
   exact List.sorted_merge.contains as bs x (Or.inr con)
 
 #print axioms List.sorted_merge.src_right_subset
+
+def List.sorted_merge.subset_of_right [Compare α] : ∀{as bs: List α},
+  bs.subset_of (as.sorted_merge bs) := by
+  apply sorted.induction
+  {
+    intro bs
+    rw [empty_left]
+    exact List.subset_of.id
+  }
+  {
+    intro a as
+    rw [empty_right]
+    exact List.subset_of.empty
+  }
+  {
+    intro a as b bs a_ord_b prev
+    rw [induct_lt a_ord_b]
+    apply List.subset_of.push_right
+    assumption
+  }
+  {
+    intro a as b bs a_ord_b prev
+    rw [induct_eq a_ord_b]
+    rw [Compare.ord_to_eq a_ord_b]
+    apply List.subset_of.push
+    apply List.subset_of.push_right
+    assumption
+  }
+  {
+    intro a as b bs a_ord_b prev
+    rw [induct_gt a_ord_b]
+    apply List.subset_of.push
+    assumption
+  }
+
+#print axioms List.sorted_merge.subset_of_right
+
+def List.sorted_merge.sublist_of_left [Compare α] : ∀{as bs: List α},
+  as.sublist_of (as.sorted_merge bs) := by
+  apply sorted.induction
+  {
+    intro bs
+    rw [empty_left]
+    apply List.sublist_of.empty
+  }
+  {
+    intro a as
+    rw [empty_right]
+    exact List.sublist_of.id
+  }
+  {
+    intro a as b bs a_ord_b prev
+    rw [induct_lt a_ord_b]
+    apply Or.inl
+    apply And.intro
+    rfl
+    apply prev
+  }
+  {
+    intro a as b bs a_ord_b prev
+    rw [induct_eq a_ord_b]
+    apply List.sublist_of.push
+    apply List.sublist_of.push_right prev
+  }
+  {
+    intro a as b bs a_ord_b prev
+    rw [induct_gt a_ord_b]
+    apply Or.inr
+    apply prev
+  }
+
+#print axioms List.sorted_merge.sublist_of_left

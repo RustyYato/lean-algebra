@@ -56,6 +56,77 @@ theorem List.sorted_intersect.induct_gt [Compare α] : ∀{a b: α} {as bs: List
 
 #print axioms List.sorted_intersect.induct_gt
 
+def List.sorted_intersect.sublist_of_left [Compare α] : ∀{as bs: List α},
+  (as.sorted_intersect bs).sublist_of as := by
+  apply sorted.induction
+  {
+    intro bs
+    rw [empty_left]
+    apply List.sublist_of.empty
+  }
+  {
+    intro a as
+    rw [empty_right]
+    exact List.sublist_of.empty
+  }
+  {
+    intro a as b bs a_ord_b prev
+    rw [induct_lt a_ord_b]
+    apply List.sublist_of.push_right
+    assumption
+  }
+  {
+    intro a as b bs a_ord_b prev
+    rw [induct_eq a_ord_b]
+    apply Or.inl
+    apply And.intro
+    rfl
+    apply prev
+  }
+  {
+    intro a as b bs a_ord_b prev
+    rw [induct_gt a_ord_b]
+    assumption
+  }
+
+#print axioms List.sorted_intersect.sublist_of_left
+
+def List.sorted_intersect.sublist_of_right [Compare α] : ∀{as bs: List α},
+  (as.sorted_intersect bs).sublist_of bs := by
+  apply sorted.induction
+  {
+    intro bs
+    rw [empty_left]
+    apply List.sublist_of.empty
+  }
+  {
+    intro a as
+    rw [empty_right]
+    exact List.sublist_of.empty
+  }
+  {
+    intro a as b bs a_ord_b prev
+    rw [induct_lt a_ord_b]
+    assumption
+  }
+  {
+    intro a as b bs a_ord_b prev
+    rw [induct_eq a_ord_b]
+    rw [Compare.ord_to_eq a_ord_b]
+    apply Or.inl
+    apply And.intro
+    rfl
+    apply prev
+  }
+  {
+    intro a as b bs a_ord_b prev
+    rw [induct_gt a_ord_b]
+    apply List.sublist_of.push_right
+    assumption
+  }
+
+#print axioms List.sorted_intersect.sublist_of_right
+
 theorem List.sorted_intersect.keeps_sorted.helper [Compare α] {x: α} : 
   ∀ {as bs},
   sorted (x::as) ->

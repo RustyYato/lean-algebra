@@ -179,3 +179,35 @@ def List.sorted_difference.keeps_sorted [Compare α] : ∀{as bs: List α},
     assumption
     exact bs_sort.pop
   }
+
+def List.sorted_difference.sublist_of_left [Compare α] : ∀{as bs: List α},
+  (as.sorted_difference bs).sublist_of as := by
+  apply sorted.induction
+  {
+    intro bs
+    rw [empty_left]
+    apply List.sublist_of.empty
+  }
+  {
+    intro a as
+    rw [empty_right]
+    exact List.sublist_of.id
+  }
+  {
+    intro a as b bs a_ord_b prev
+    rw [induct_lt a_ord_b]
+    apply List.sublist_of.push
+    assumption
+  }
+  {
+    intro a as b bs a_ord_b prev
+    rw [induct_eq a_ord_b]
+    apply List.sublist_of.push_right prev
+  }
+  {
+    intro a as b bs a_ord_b prev
+    rw [induct_gt a_ord_b]
+    assumption
+  }
+
+#print axioms List.sorted_difference.sublist_of_left

@@ -242,3 +242,45 @@ def List.subset_of.trans {as bs cs: List α} : as.subset_of bs -> bs.subset_of c
     apply List.subset_of.trans sub_ab.pop_left sub_bc
 
 #print axioms List.subset_of.trans
+
+def List.sublist_of (as bs: List α): Prop := match as with
+   | [] => True
+   | a::as => match bs with
+      |  [] => False
+      | b::bs => a = b ∧ as.sublist_of bs ∨ (a::as).sublist_of bs
+
+def List.sublist_of.empty { bs: List α }: [].sublist_of bs := by
+  unfold List.sublist_of
+  trivial
+
+def List.sublist_of.id { as: List α }: as.sublist_of as := by
+  match as with
+  | [] => trivial
+  | a::as' =>
+  apply Or.inl
+  apply And.intro
+  rfl
+  apply List.sublist_of.id
+
+def List.sublist_of.push_right { b: α } { as bs: List α }: as.sublist_of bs -> as.sublist_of (b::bs) := by
+  intro sub
+  match as with
+  | [] => trivial
+  | a::as =>
+  apply Or.inr
+  assumption
+
+def List.sublist_of.pop_left { a: α } { as bs: List α }: (a::as).sublist_of bs -> as.sublist_of bs := by
+  intro sub
+  match bs with
+  | b::bs => 
+  match sub with
+  | .inl ⟨ _, h ⟩ => exact h.push_right
+  | .inr h => exact h.pop_left.push_right
+
+def List.sublist_of.push { x: α } { as bs: List α }: as.sublist_of bs -> (x::as).sublist_of (x::bs) := by
+  intro sub
+  apply Or.inl
+  apply And.intro
+  rfl
+  assumption
