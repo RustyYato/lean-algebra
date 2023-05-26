@@ -292,3 +292,45 @@ def List.sublist_of.push { x: α } { as bs: List α }: as.sublist_of bs -> (x::a
   apply And.intro
   rfl
   assumption
+
+def List.sublist_of.pop { x: α } { as bs: List α }: (x::as).sublist_of (x::bs) -> as.sublist_of bs := by
+  intro sub
+  match sub with
+  | .inl ⟨ _, prf ⟩ => exact prf
+  | .inr h => exact h.pop_left
+
+def List.sublist_of.pop_right { b: α } { as bs: List α }: as.sublist_of (b::bs) -> ¬ as.containsP b -> as.sublist_of bs := by
+  intro sub not_con
+  match as with
+  | [] =>
+    exact List.sublist_of.empty
+  | a::as =>
+  match sub with
+  | .inl ⟨ a_eq_b, _ ⟩  =>
+    rw [a_eq_b] at not_con
+    apply False.elim
+    apply not_con
+    apply Or.inl
+    rfl
+  | .inr _ =>
+    assumption
+
+def List.sublist_of.allP {as bs: List α} : as.sublist_of bs -> (∀{P}, bs.allP P -> as.allP P) := by
+  intro sub P all_bs
+  match as with
+  | [] => trivial
+  | a::as =>
+  match bs with
+  | b::bs =>
+    match sub with
+    | .inl ⟨ h, rest ⟩ =>
+      apply And.intro
+      rw [h]
+      exact all_bs.left
+      apply List.sublist_of.allP
+      exact rest
+      exact all_bs.right
+    | .inr rest =>
+      apply List.sublist_of.allP
+      exact rest
+      exact all_bs.right
