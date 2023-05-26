@@ -249,7 +249,7 @@ theorem List.sorted_intersect.of_contains [Compare α] : ∀(as bs: List α) (x:
     match as_con with
     | .inl h =>
       simp at h
-      have := List.sorted.contains bs_con bs_sort
+      have := bs_sort.contains bs_con
       rw [h] at this
       have := Compare.not_lt_and_le a_ord_b
       contradiction
@@ -293,7 +293,7 @@ theorem List.sorted_intersect.of_contains [Compare α] : ∀(as bs: List α) (x:
     match bs_con with
     | .inl h =>
       simp at h
-      have := List.sorted.contains as_con as_sort
+      have := as_sort.contains as_con
       rw [h] at this
       have := Compare.not_lt_and_le (Compare.flip a_ord_b)
       contradiction
