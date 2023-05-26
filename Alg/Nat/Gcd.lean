@@ -377,3 +377,24 @@ theorem nat.gcd.cancel_right (c: nat.coprime x b) : gcd (a * x) b = gcd a b := b
   apply cancel_left c
 
 #print axioms nat.gcd.cancel_right
+
+theorem nat.gcd.zero {a b: nat} : a.gcd b = .zero -> a = nat.zero ∧ b = nat.zero := fun gcd_eq_zero =>
+  match a, b with
+   | .zero, .zero => ⟨ rfl, rfl ⟩
+   | .inc a, b => by
+      have ⟨ left, _ ⟩  := nat.gcd.is_dvd a.inc b
+      rw [gcd_eq_zero] at left
+      have := left.by_zero
+      contradiction
+   | .zero, .inc _ => by
+      rw [nat.gcd.zero_left] at gcd_eq_zero
+      contradiction
+
+#print axioms nat.gcd.zero
+
+theorem nat.gcd.nz (a b: nat) : a ≠ .zero ∨ b ≠ .zero -> a.gcd b ≠ .zero := fun a_or_b_nz =>
+  match a_or_b_nz with
+   | .inl h => fun gcd_eq_zero => h (gcd.zero gcd_eq_zero).left
+   | .inr h => fun gcd_eq_zero => h (gcd.zero gcd_eq_zero).right
+
+#print axioms nat.gcd.nz

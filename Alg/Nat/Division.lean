@@ -319,3 +319,7 @@ theorem nat.of_mul_rem: ∀(a b: nat), b ≠ zero -> f * (a % b) = (f * a) % (f 
   }
 
 #print axioms nat.of_mul_rem
+
+theorem nat.zero_div : ∀x, nat.zero / x = nat.zero := by
+  intro x
+  cases x <;> rfl

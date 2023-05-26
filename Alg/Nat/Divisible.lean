@@ -179,3 +179,25 @@ theorem dvd.add_cancel_right : x ∣ b -> x ∣ (a + b) -> x ∣ a := by
   apply dvd.add_cancel_left
 
 #print axioms dvd.add_cancel_right
+
+theorem dvd.mul_cancel_com_left { a b x: nat } (x_nz: x ≠ .zero) : (x * a) ∣ (x * b) -> a ∣ b := by 
+  intro xa_dvd_xb
+  have ⟨ y, prf ⟩ := xa_dvd_xb
+  exists y
+  rw [nat.mul_comm x, nat.mul_comm x] at prf
+  apply nat.of_mul_irr
+  rw [nat.mul_perm_ab_c_to_ac_b]
+  exact prf
+  assumption
+
+#print axioms dvd.to_add
+
+theorem dvd.nz { a b: nat } (b_nz: b ≠ .zero) : a ∣ b -> a ≠ .zero  := by
+  intro a_dvd_b a_eq_zero
+  rw [a_eq_zero] at a_dvd_b
+  have ⟨ x, prf ⟩ := a_dvd_b
+  rw [nat.mul_zero_left] at prf
+  rw [prf] at b_nz
+  contradiction
+
+#print axioms dvd.nz
