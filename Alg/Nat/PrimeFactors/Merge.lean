@@ -58,7 +58,7 @@ theorem list_product.of_sorted_merge :
 
 #print axioms list_product.of_sorted_merge
 
-theorem PrimeFactorization.merge
+def PrimeFactorization.merge
   (fa: PrimeFactorization a)
   (fb: PrimeFactorization b):
   PrimeFactorization (a * b) := by

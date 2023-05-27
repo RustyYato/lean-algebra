@@ -105,7 +105,7 @@ theorem PrimeFactorization.difference_raw:
 
 #print axioms PrimeFactorization.difference_raw
 
-theorem PrimeFactorization.difference
+def PrimeFactorization.difference
   (pa: PrimeFactorization an)
   (pb: PrimeFactorization bn):
   bn ∣ an ->

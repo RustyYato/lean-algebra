@@ -96,7 +96,7 @@ theorem list_product.of_sorted_intersect :
 
 #print axioms list_product.of_sorted_intersect
 
-theorem PrimeFactorization.intersect
+def PrimeFactorization.intersect
   (fa: PrimeFactorization a)
   (fb: PrimeFactorization b):
   PrimeFactorization (a.gcd b) := by
