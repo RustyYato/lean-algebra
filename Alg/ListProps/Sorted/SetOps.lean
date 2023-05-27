@@ -134,11 +134,11 @@ theorem List.sorted.union_def.helper [Compare α]:
     | .isTrue ⟨ a_ord_x, b_ord_x ⟩  =>
       rw [Compare.ord_to_eq a_ord_x, Compare.ord_to_eq b_ord_x]
       rw [sorted_intersect.induct_eq (Compare.ord_id _)] at *
-      rw [List.append_cons, ←all_eq_to_end, List.cons_append]
-      rw [List.append_cons, ←all_eq_to_end, List.cons_append]
+      rw [_append_cons, ←all_eq_to_end, List.cons_append]
+      rw [_append_cons, ←all_eq_to_end, List.cons_append]
       rw [sorted_difference.induct_eq (Compare.ord_id _)] at *
       rw [sorted_union.induct_eq (Compare.ord_id _)] at *
-      rw [List.append_cons, ←all_eq_to_end]
+      rw [_append_cons, ←all_eq_to_end]
       rw [←List.cons_append]
       rw [@prev x (x::xs) (⟨ rfl , xs_eq_x ⟩) as_sort.pop_snd bs_sort.pop_snd]
       assumption
@@ -147,7 +147,7 @@ theorem List.sorted.union_def.helper [Compare α]:
     | .isFalse not_and_ord => 
     rw [List.sorted_difference.all_not_in_right _ _ rfl]
     congr
-    
+
     {
       rw [List.sorted_intersect.induct_eq a_ord_b]
       rw [List.sorted_union.induct_eq a_ord_b]

@@ -19,3 +19,16 @@ theorem _append_assoc (as bs cs : List α) : (as ++ bs) ++ cs = as ++ (bs ++ cs)
 theorem _fold_append (as bs : List α) : as.append bs = as ++ bs := rfl
 
 #print axioms _append_assoc
+
+axiom Test: False
+
+theorem _append_cons (as : List α) (b : α) (bs : List α) : as ++ b :: bs = as ++ [b] ++ bs := by
+  induction as with
+  | nil => rfl
+  | cons a as ih =>
+    rw [List.cons_append]
+    rw [ih]
+    rw [List.cons_append]
+    rw [List.cons_append]
+
+#print axioms _append_cons
