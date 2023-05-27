@@ -274,8 +274,6 @@ theorem nat.rem_le: ∀(a b: nat), b ≠ zero -> a % b <= a  := by
 
 #print axioms nat.rem_lt
 
-axiom Test : False
-
 theorem nat.of_mul_rem: ∀(a b: nat), b ≠ zero -> f * (a % b) = (f * a) % (f * b)  := by
   apply divrem.induction
 

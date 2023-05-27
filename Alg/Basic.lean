@@ -20,8 +20,6 @@ theorem _fold_append (as bs : List α) : as.append bs = as ++ bs := rfl
 
 #print axioms _append_assoc
 
-axiom Test: False
-
 theorem _append_cons (as : List α) (b : α) (bs : List α) : as ++ b :: bs = as ++ [b] ++ bs := by
   induction as with
   | nil => rfl
