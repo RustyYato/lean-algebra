@@ -1,10 +1,6 @@
 import Alg.Nat.PrimeFactors
 import Alg.ListProps.Sorted.Intersect
 
-def contrapositive : (P -> Q) -> ¬ Q -> ¬ P := by
-  intro p_to_q not_q p
-  exact not_q (p_to_q p)
-
 theorem list_product.of_sorted_intersect :
   ∀{as bs: List nat},
   as.sorted ->
@@ -44,7 +40,7 @@ theorem list_product.of_sorted_intersect :
       assumption
     }
     {
-      have not_con := List.sorted.not_contains a_ord_b bs_sort
+      have not_con := bs_sort.not_contains a_ord_b
       generalize b_fact_def:PrimeFactorization.mk (b::bs) bs_primes rfl bs_sort = b_fact
       have b_complete := b_fact.is_complete a as_primes.left
       rw [←b_fact_def] at b_complete
@@ -87,7 +83,7 @@ theorem list_product.of_sorted_intersect :
       exact bs_primes.right
     }
     {
-      have not_con := List.sorted.not_contains (Compare.flip a_ord_b) as_sort
+      have not_con := as_sort.not_contains (Compare.flip a_ord_b)
       generalize a_fact_def:PrimeFactorization.mk (a::as) as_primes rfl as_sort = a_fact
       have a_complete := a_fact.is_complete b bs_primes.left
       rw [←a_fact_def] at a_complete

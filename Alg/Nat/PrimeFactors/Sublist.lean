@@ -110,7 +110,7 @@ theorem PrimeFactorization.to_sub_list_raw:
     have a_complete := PrimeFactorization.is_complete_raw (a::as) a_primes rfl
 
 
-    have as_not_contains_b := contrapositive a_sort.contains (Compare.not_lt_and_le (Compare.flip a_ord_b))
+    have as_not_contains_b := contrapositive (a_sort.contains ·) (Compare.not_lt_and_le (Compare.flip a_ord_b))
     have not_divis_b_as := contrapositive (a_complete b b_primes.left) as_not_contains_b 
 
     match b_primes.left.to_coprime_or_dvd (list_product $ a::as) with
