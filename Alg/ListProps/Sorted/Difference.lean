@@ -332,19 +332,6 @@ def List.sorted_difference.not_in_right [Compare α] : ∀{as bs: List α},
 
 #print axioms List.sorted_difference.not_in_right
 
-def left_concat_eq_append : a::as = [a] ++ as := rfl
-
-#print axioms left_concat_eq_append
-
-theorem _append_assoc (as bs cs : List α) : (as ++ bs) ++ cs = as ++ (bs ++ cs) := by
-  induction as with
-  | nil => rfl
-  | cons a as ih =>
-    repeat rw [List.cons_append]
-    congr
-
-#print axioms _append_assoc
-
 def List.sorted_difference.all_not_in_right [Compare α] : ∀{as bs: List α},
   as.sorted ->
   bs.sorted ->

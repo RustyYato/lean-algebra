@@ -1,4 +1,5 @@
 import Alg.Compare
+import Alg.Basic
 
 def List.allP (list: List α) (P: α -> Prop) := match list with
   | [] => True
@@ -399,7 +400,37 @@ def List.sorted.append [Compare α] {as bs: List α} :
   bs = d::ds ->
   c <= d ->
   (as ++ bs).sorted := by
-  sorry
+  intro as_sort bs_sort c cs as_eq_cs d ds b_eq_ds c_le_d
+  rw [as_eq_cs, b_eq_ds]
+  rw [as_eq_cs] at as_sort
+  rw [b_eq_ds] at bs_sort
 
+  match cs with
+  | [] =>
+    rw [List.nil_append, List.cons_append, List.nil_append]
+    apply And.intro
+    assumption
+    assumption
+  | [c'] =>
+    simp
+    apply And.intro
+    simp at as_sort
+    exact as_sort.left
+    apply And.intro
+    assumption
+    assumption
+  | c'::c''::cs =>
+    apply And.intro
+    exact as_sort.left
+    repeat rw [_fold_append]
+    rw [←cons_append]
+    rw [←cons_append]
+    
+    apply List.sorted.append
+    exact as_sort.pop
+    exact bs_sort
+    rfl
+    rfl
+    assumption
 
 #print axioms List.sorted.append
