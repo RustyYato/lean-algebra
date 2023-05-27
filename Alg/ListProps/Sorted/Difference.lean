@@ -83,6 +83,8 @@ def List.sorted_difference.subset_of [Compare α] : ∀{as bs: List α},
     assumption
   }
 
+#print axioms List.sorted_difference.subset_of
+
 theorem List.sorted_difference.keeps_sorted.helper [Compare α] {x: α} : 
   ∀ {as bs},
   sorted (x::as) ->
@@ -180,6 +182,8 @@ def List.sorted_difference.keeps_sorted [Compare α] : ∀{as bs: List α},
     exact bs_sort.pop
   }
 
+#print axioms List.sorted_difference.keeps_sorted
+
 def List.sorted_difference.sublist_of_left [Compare α] : ∀{as bs: List α},
   (as.sorted_difference bs).sublist_of as := by
   apply sorted.induction
@@ -211,3 +215,159 @@ def List.sorted_difference.sublist_of_left [Compare α] : ∀{as bs: List α},
   }
 
 #print axioms List.sorted_difference.sublist_of_left
+
+def List.sorted_difference.not_in_left [Compare α] : ∀{as bs: List α},
+  bs.sorted ->
+  bs = c::cs ->
+  ¬as.containsP c ->
+  as.sorted_difference bs = as.sorted_difference cs := by
+  apply sorted.induction
+  {
+    intro bs
+    intro _ _ _
+    rw [empty_left, empty_left]
+  }
+  {
+    intro bs
+    intro b_sort _ not_con
+    contradiction
+  }
+  {
+    intro a as b bs a_ord_b prev
+    intro b_sort bs_eq_cs not_con
+    rw [induct_lt a_ord_b]
+    have := prev b_sort bs_eq_cs (by
+        intro con
+        apply not_con
+        apply Or.inr
+        assumption)
+    rw [this]
+    match cs with
+    | [] =>
+      rw [empty_right, empty_right]
+    | c'::cs =>
+      rw [induct_lt]
+      rw [(List.cons.inj bs_eq_cs).left] at a_ord_b
+      rw [bs_eq_cs] at b_sort
+      exact Compare.lt_le_trans a_ord_b b_sort.left
+  }
+  {
+    intro a as b bs a_ord_b prev
+    intro b_sort bs_eq_cs not_con
+    rw [(List.cons.inj bs_eq_cs).left] at a_ord_b
+    rw [Compare.ord_to_eq a_ord_b] at not_con
+    have := not_con (Or.inl rfl)
+    contradiction
+  }
+  {
+    intro a as b bs a_ord_b _
+    intro _ bs_eq_cs _
+    rw [induct_gt a_ord_b]
+    rw [(List.cons.inj bs_eq_cs).right]
+  }
+
+def List.sorted_difference.not_in_right [Compare α] : ∀{as bs: List α},
+  as.sorted ->
+  bs.sorted ->
+  as = c::cs ->
+  ¬bs.containsP c ->
+  as.sorted_difference bs = c::(cs.sorted_difference bs) := by
+  apply sorted.induction
+  {
+    intro bs
+    intro _ _ a_eq_c _
+    rw [empty_left]
+    contradiction
+  }
+  {
+    intro a as
+    intro _ _ a_eq_c _
+    rw [empty_right]
+    rw [empty_right]
+    rw [a_eq_c]
+  }
+  {
+    intro a as b bs a_ord_b _
+    intro _ _ a_eq_c _
+    rw [induct_lt a_ord_b]
+    have ⟨ a_eq_c, as_eq_cs ⟩ := List.cons.inj a_eq_c
+    rw [a_eq_c]
+    congr
+  }
+  {
+    intro a as b bs a_ord_b _
+    intro _ _ a_eq_c not_con
+    rw [induct_eq a_ord_b]
+    have ⟨ a_eq_c, as_eq_cs ⟩ := List.cons.inj a_eq_c
+    have := Compare.ord_to_eq a_ord_b
+    rw [a_eq_c.symm.trans this] at not_con
+    have := not_con (Or.inl rfl)
+    contradiction
+  }
+  {
+    intro a as b bs a_ord_b prev
+    intro a_sort b_sort as_eq_cs not_con
+    rw [induct_gt a_ord_b]
+    rw [prev a_sort b_sort.pop as_eq_cs]
+    {
+      rw [←List.sorted_difference.not_in_left]
+      exact b_sort
+      rfl
+      have := a_sort.pop
+      have ⟨ _, as_eq_cs ⟩  := List.cons.inj as_eq_cs
+      rw [←as_eq_cs]
+      match as with
+      | [] =>
+        intro; contradiction
+      | a'::as =>
+      apply (a_sort.pop).not_contains
+      apply Compare.lt_le_trans (Compare.flip a_ord_b)
+      exact a_sort.left
+    }
+    intro con_tail
+    apply not_con
+    apply Or.inr
+    assumption
+  }
+
+#print axioms List.sorted_difference.not_in_right
+
+def left_concat_eq_append : a::as = [a] ++ as := rfl
+
+#print axioms left_concat_eq_append
+
+theorem _append_assoc (as bs cs : List α) : (as ++ bs) ++ cs = as ++ (bs ++ cs) := by
+  induction as with
+  | nil => rfl
+  | cons a as ih =>
+    repeat rw [List.cons_append]
+    congr
+
+#print axioms _append_assoc
+
+def List.sorted_difference.all_not_in_right [Compare α] : ∀{as bs: List α},
+  as.sorted ->
+  bs.sorted ->
+  as = cs ++ ds ->
+  cs.allP (fun c => ¬bs.containsP c) ->
+  as.sorted_difference bs = cs ++ (ds.sorted_difference bs) := by
+  induction cs with
+  | nil =>
+    intro as bs _ _ as_eq_cs_ds all_cs_not_in_bs
+    rw [List.nil_append] at as_eq_cs_ds
+    rw [List.nil_append, as_eq_cs_ds]
+  | cons c cs ih =>
+    intro as bs as_sorted bs_sorted as_eq_cs_ds all_cs_not_in_bs
+    match as with
+    | a::as =>
+    have ⟨ a_eq_c, as_eq_cs_ds ⟩ := List.cons.inj as_eq_cs_ds
+    have := ih as_sorted.pop bs_sorted as_eq_cs_ds all_cs_not_in_bs.right
+    rw [@left_concat_eq_append _ c, _append_assoc, ←left_concat_eq_append]
+    rw [←this]
+    have c_not_in_bs := all_cs_not_in_bs.left
+    rw [←a_eq_c] at *
+    apply List.sorted_difference.not_in_right _ _ rfl
+    any_goals assumption
+
+#print axioms List.sorted_difference.all_not_in_right
+

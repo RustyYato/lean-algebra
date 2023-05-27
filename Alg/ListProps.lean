@@ -83,8 +83,8 @@ instance List.dec_sorted [Compare α] (as: List α) : Decidable (as.sorted) :=
 
 #print axioms List.dec_containsP
 
-def List.sorted.contains [Compare α] {x a: α} : (a::as).sorted -> (a::as).containsP x -> a <= x := by
-  intro as_sort as_con
+def List.sorted.contains [Compare α] {a: α} : (a::as).sorted -> ∀{{x}}, (a::as).containsP x -> a <= x := by
+  intro as_sort _ as_con
   unfold containsP anyP at as_con
   match as_con with
   | .inl h => 
@@ -257,9 +257,13 @@ def List.sublist_of (as bs: List α): Prop := match as with
       |  [] => False
       | b::bs => a = b ∧ as.sublist_of bs ∨ (a::as).sublist_of bs
 
+#print axioms List.sublist_of
+
 def List.sublist_of.empty { bs: List α }: [].sublist_of bs := by
   unfold List.sublist_of
   trivial
+
+#print axioms List.sublist_of.empty
 
 def List.sublist_of.id { as: List α }: as.sublist_of as := by
   match as with
@@ -270,6 +274,8 @@ def List.sublist_of.id { as: List α }: as.sublist_of as := by
   rfl
   apply List.sublist_of.id
 
+#print axioms List.sublist_of.id
+
 def List.sublist_of.push_right { b: α } { as bs: List α }: as.sublist_of bs -> as.sublist_of (b::bs) := by
   intro sub
   match as with
@@ -277,6 +283,8 @@ def List.sublist_of.push_right { b: α } { as bs: List α }: as.sublist_of bs ->
   | a::as =>
   apply Or.inr
   assumption
+
+#print axioms List.sublist_of.push_right
 
 def List.sublist_of.pop_left { a: α } { as bs: List α }: (a::as).sublist_of bs -> as.sublist_of bs := by
   intro sub
@@ -286,6 +294,8 @@ def List.sublist_of.pop_left { a: α } { as bs: List α }: (a::as).sublist_of bs
   | .inl ⟨ _, h ⟩ => exact h.push_right
   | .inr h => exact h.pop_left.push_right
 
+#print axioms List.sublist_of.pop_left
+
 def List.sublist_of.push { x: α } { as bs: List α }: as.sublist_of bs -> (x::as).sublist_of (x::bs) := by
   intro sub
   apply Or.inl
@@ -293,11 +303,15 @@ def List.sublist_of.push { x: α } { as bs: List α }: as.sublist_of bs -> (x::a
   rfl
   assumption
 
+#print axioms List.sublist_of.push
+
 def List.sublist_of.pop { x: α } { as bs: List α }: (x::as).sublist_of (x::bs) -> as.sublist_of bs := by
   intro sub
   match sub with
   | .inl ⟨ _, prf ⟩ => exact prf
   | .inr h => exact h.pop_left
+
+#print axioms List.sublist_of.pop
 
 def List.sublist_of.pop_right { b: α } { as bs: List α }: as.sublist_of (b::bs) -> ¬ as.containsP b -> as.sublist_of bs := by
   intro sub not_con
@@ -314,6 +328,8 @@ def List.sublist_of.pop_right { b: α } { as bs: List α }: as.sublist_of (b::bs
     rfl
   | .inr _ =>
     assumption
+
+#print axioms List.sublist_of.pop_right
 
 def List.sublist_of.allP {as bs: List α} : as.sublist_of bs -> (∀{P}, bs.allP P -> as.allP P) := by
   intro sub P all_bs
@@ -334,3 +350,42 @@ def List.sublist_of.allP {as bs: List α} : as.sublist_of bs -> (∀{P}, bs.allP
       apply List.sublist_of.allP
       exact rest
       exact all_bs.right
+
+#print axioms List.sublist_of.allP
+
+def List.sublist_of.anyP {as bs: List α} : as.sublist_of bs -> (∀{P}, as.anyP P -> bs.anyP P) := by
+  intro sub P any_as
+  match as with
+  | a::as =>
+  match bs with
+  | b::bs =>
+  match any_as with
+  | .inl h => 
+    match sub with
+    | .inl ⟨ eq, _ ⟩  =>
+      apply Or.inl
+      rw [←eq]
+      exact h
+    | .inr rest =>
+      apply Or.inr
+      apply List.sublist_of.anyP rest
+      assumption
+  | .inr h =>
+    match sub with
+    | .inl ⟨ _, rest ⟩  =>
+      apply Or.inr
+      apply List.sublist_of.anyP rest
+      assumption
+    | .inr rest =>
+      apply Or.inr
+      apply List.sublist_of.anyP rest
+      assumption
+
+#print axioms List.sublist_of.anyP
+
+def List.sublist_of.containsP {as bs: List α} : as.sublist_of bs -> (∀{x}, as.containsP x -> bs.containsP x) := by
+  unfold List.containsP
+  intro as bs
+  apply List.sublist_of.anyP as
+
+#print axioms List.sublist_of.containsP

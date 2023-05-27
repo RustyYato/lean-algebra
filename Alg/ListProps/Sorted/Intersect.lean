@@ -56,7 +56,7 @@ theorem List.sorted_intersect.induct_gt [Compare α] : ∀{a b: α} {as bs: List
 
 #print axioms List.sorted_intersect.induct_gt
 
-def List.sorted_intersect.sublist_of_left [Compare α] : ∀{as bs: List α},
+def List.sorted_intersect.sublist_of_left [Compare α] : ∀(as bs: List α),
   (as.sorted_intersect bs).sublist_of as := by
   apply sorted.induction
   {
@@ -91,7 +91,7 @@ def List.sorted_intersect.sublist_of_left [Compare α] : ∀{as bs: List α},
 
 #print axioms List.sorted_intersect.sublist_of_left
 
-def List.sorted_intersect.sublist_of_right [Compare α] : ∀{as bs: List α},
+def List.sorted_intersect.sublist_of_right [Compare α] : ∀(as bs: List α),
   (as.sorted_intersect bs).sublist_of bs := by
   apply sorted.induction
   {
