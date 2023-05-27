@@ -389,3 +389,17 @@ def List.sublist_of.containsP {as bs: List α} : as.sublist_of bs -> (∀{x}, as
   apply List.sublist_of.anyP as
 
 #print axioms List.sublist_of.containsP
+
+def List.sorted.append [Compare α] {as bs: List α} : 
+  as.sorted ->
+  bs.sorted ->
+  ∀{c cs},
+  as = cs ++ [c] ->
+  ∀{d ds},
+  bs = d::ds ->
+  c <= d ->
+  (as ++ bs).sorted := by
+  sorry
+
+
+#print axioms List.sorted.append
