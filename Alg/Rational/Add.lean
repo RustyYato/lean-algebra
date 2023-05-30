@@ -103,3 +103,55 @@ def rational.add_zero_right (a b: rational):
   assumption
   
 #print axioms rational.add_zero_right
+
+def rational.add_assoc (a b c: rational):
+  (a + b) + c ≈ a + (b + c) := by
+  unfold HAdd.hAdd instHAdd Add.add Add rational.add
+  apply rational.equiv.of_prop
+  simp
+  repeat rw [nat.mul_add_right]
+  repeat rw [nat.mul_add_left]
+  repeat rw [nat.mul_add_right]
+  rw [nat.add_assoc]
+  apply nat.add_eq_add
+  apply nat.add_eq_add
+  rw [@nat.mul_perm_ab_c_to_a_bc a.top, @nat.mul_perm_ab_c_to_a_bc a.bot]
+  rw [@nat.mul_perm_ab_c_to_a_bc a.bot, @nat.mul_perm_ab_c_to_a_bc _ b.bot]
+  rw [@nat.mul_perm_ab_c_to_a_bc a.bot, @nat.mul_perm_a_bc_to_ab_c _ _ c.bot]
+
+#print axioms rational.add_assoc
+
+-- theorem rational.add_perm_a_bc_to_ab_c { a b c: rational } : a + (b + c) ≈ (a + b) + c := by
+--   apply rational.Equiv.symm
+--   apply rational.add_assoc
+-- theorem rational.add_perm_a_bc_to_ba_c { a b c: rational } : a + (b + c) ≈ (b + a) + c := by
+--   apply rational.Equiv.trans _ (rational.add_assoc b a c).symm
+--   apply rational.Equiv.trans _ (rational.add_comm b (a + c)).symm
+--   apply rational.Equiv.trans _ (rational.add_assoc a c b).symm
+--   apply rational.add_eq
+--   rfl
+--   apply rational.add_comm
+
+-- theorem rational.add_perm_a_bc_to_ac_b { a b c: rational } : a + (b + c) ≈ (a + c) + b := by rw [rational.add_comm b, rational.add_assoc]
+-- theorem rational.add_perm_a_bc_to_ca_b { a b c: rational } : a + (b + c) ≈ (c + a) + b := by rw [rational.add_comm b, rational.add_assoc, rational.add_comm a c]
+-- theorem rational.add_perm_a_bc_to_bc_a { a b c: rational } : a + (b + c) ≈ (b + c) + a := by rw [rational.add_comm]
+-- theorem rational.add_perm_a_bc_to_cb_a { a b c: rational } : a + (b + c) ≈ (c + b) + a := by rw [rational.add_comm a, rational.add_comm b]
+
+-- theorem rational.add_perm_a_bc_to_c_ab { a b c: rational } : a + (b + c) ≈ c + (a + b) := by rw [rational.add_perm_a_bc_to_ca_b, rational.add_assoc]
+-- theorem rational.add_perm_a_bc_to_c_ba { a b c: rational } : a + (b + c) ≈ c + (b + a) := by rw [rational.add_perm_a_bc_to_cb_a, rational.add_assoc]
+-- theorem rational.add_perm_a_bc_to_b_ac { a b c: rational } : a + (b + c) ≈ b + (a + c) := by rw [rational.add_perm_a_bc_to_ba_c, rational.add_assoc]
+-- theorem rational.add_perm_a_bc_to_b_ca { a b c: rational } : a + (b + c) ≈ b + (c + a) := by rw [rational.add_perm_a_bc_to_bc_a, rational.add_assoc]
+-- theorem rational.add_perm_a_bc_to_a_cb { a b c: rational } : a + (b + c) ≈ a + (c + b) := by rw [rational.add_perm_a_bc_to_ac_b, rational.add_assoc]
+
+-- theorem rational.add_perm_ab_c_to_c_ab { a b c: rational } : (a + b) + c ≈ c + (a + b) := by rw [←rational.add_perm_a_bc_to_bc_a]
+-- theorem rational.add_perm_ab_c_to_c_ba { a b c: rational } : (a + b) + c ≈ c + (b + a) := by rw [←rational.add_perm_a_bc_to_cb_a]
+-- theorem rational.add_perm_ab_c_to_b_ac { a b c: rational } : (a + b) + c ≈ b + (a + c) := by rw [←rational.add_perm_a_bc_to_ba_c]
+-- theorem rational.add_perm_ab_c_to_b_ca { a b c: rational } : (a + b) + c ≈ b + (c + a) := by rw [←rational.add_perm_a_bc_to_ca_b]
+-- theorem rational.add_perm_ab_c_to_a_bc { a b c: rational } : (a + b) + c ≈ a + (b + c) := by rw [←rational.add_perm_a_bc_to_ab_c]
+-- theorem rational.add_perm_ab_c_to_a_cb { a b c: rational } : (a + b) + c ≈ a + (c + b) := by rw [←rational.add_perm_a_bc_to_ac_b]
+
+-- theorem rational.add_perm_ab_c_to_ba_c { a b c: rational } : (a + b) + c ≈ (b + a) + c := by rw [rational.add_perm_ab_c_to_a_bc, rational.add_perm_a_bc_to_ba_c]
+-- theorem rational.add_perm_ab_c_to_ac_b { a b c: rational } : (a + b) + c ≈ (a + c) + b := by rw [rational.add_perm_ab_c_to_a_bc, rational.add_perm_a_bc_to_ac_b]
+-- theorem rational.add_perm_ab_c_to_ca_b { a b c: rational } : (a + b) + c ≈ (c + a) + b := by rw [rational.add_perm_ab_c_to_a_bc, rational.add_perm_a_bc_to_ca_b]
+-- theorem rational.add_perm_ab_c_to_bc_a { a b c: rational } : (a + b) + c ≈ (b + c) + a := by rw [rational.add_perm_ab_c_to_a_bc, rational.add_perm_a_bc_to_bc_a]
+-- theorem rational.add_perm_ab_c_to_cb_a { a b c: rational } : (a + b) + c ≈ (c + b) + a := by rw [rational.add_perm_ab_c_to_a_bc, rational.add_perm_a_bc_to_cb_a]
