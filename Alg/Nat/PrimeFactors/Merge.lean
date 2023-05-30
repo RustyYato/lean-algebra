@@ -74,3 +74,15 @@ def PrimeFactorization.merge
   exact fb.sorted
 
 #print axioms PrimeFactorization.merge
+
+theorem PrimeFactorization.merge.proof
+  (fa: PrimeFactorization a)
+  (fb: PrimeFactorization b)
+  (fab: PrimeFactorization (a * b)):
+  fab.factors = fa.factors.sorted_merge fb.factors := by
+  generalize h:PrimeFactorization.merge fa fb = fab'
+  unfold merge at h
+  rw [Subsingleton.allEq fab fab']
+  rw [←h]
+
+#print axioms PrimeFactorization.merge.proof

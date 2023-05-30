@@ -118,3 +118,15 @@ def PrimeFactorization.intersect
   exact fb.sorted
 
 #print axioms PrimeFactorization.intersect
+
+theorem PrimeFactorization.intersect.proof
+  (fa: PrimeFactorization a)
+  (fb: PrimeFactorization b)
+  (fab: PrimeFactorization (a.gcd b)):
+  fab.factors = fa.factors.sorted_intersect fb.factors := by
+  generalize h:PrimeFactorization.intersect fa fb = fab'
+  unfold intersect at h
+  rw [Subsingleton.allEq fab fab']
+  rw [←h]
+
+#print axioms PrimeFactorization.intersect.proof

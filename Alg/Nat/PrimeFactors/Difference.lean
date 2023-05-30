@@ -111,12 +111,14 @@ def PrimeFactorization.difference
   bn ∣ an ->
   PrimeFactorization (an / bn) := by
   intro sub
-  rw [pa.eq_n, pb.eq_n]
   apply PrimeFactorization.mk (pa.factors.sorted_difference pb.factors)
-  have := (pa.factors.sorted_difference pb.factors)
   apply List.sorted_difference.sublist_of_left.allP
   exact pa.all_primes
   {
+    conv => {
+      lhs
+      rw [pa.eq_n, pb.eq_n]
+    }
     apply PrimeFactorization.difference_raw
     rw [←pa.eq_n, ←pb.eq_n]
     assumption
@@ -131,3 +133,19 @@ def PrimeFactorization.difference
   exact pb.sorted
 
 #print axioms PrimeFactorization.difference
+
+theorem PrimeFactorization.difference.proof
+  (fa: PrimeFactorization a)
+  (fb: PrimeFactorization b)
+  (fab: PrimeFactorization (a / b)):
+  b ∣ a ->
+  fab.factors = fa.factors.sorted_difference fb.factors := by
+  intro b_dvd_a
+  generalize h:PrimeFactorization.difference fa fb b_dvd_a = fab'
+  rw [Subsingleton.allEq fab fab']
+  rw [←h]
+  unfold difference
+  congr
+  
+
+#print axioms PrimeFactorization.difference.proof
