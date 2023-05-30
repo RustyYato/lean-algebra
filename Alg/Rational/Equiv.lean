@@ -24,6 +24,12 @@ instance rational.Equiv : Equivalence rational.equiv where
     apply nat.to_mul_irr
     assumption
 
+instance rational.TransHasEquiv : (Trans rational.HasEquiv.Equiv rational.HasEquiv.Equiv rational.HasEquiv.Equiv) where
+  trans := rational.Equiv.trans
+
+instance rational.Trans : Trans rational.equiv rational.equiv rational.equiv where
+  trans := rational.Equiv.trans
+
 instance rational.Setoid : Setoid rational where
     r := rational.equiv
     iseqv := rational.Equiv

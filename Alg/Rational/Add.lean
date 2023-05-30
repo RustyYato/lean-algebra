@@ -121,18 +121,29 @@ def rational.add_assoc (a b c: rational):
 
 #print axioms rational.add_assoc
 
--- theorem rational.add_perm_a_bc_to_ab_c { a b c: rational } : a + (b + c) ≈ (a + b) + c := by
---   apply rational.Equiv.symm
---   apply rational.add_assoc
--- theorem rational.add_perm_a_bc_to_ba_c { a b c: rational } : a + (b + c) ≈ (b + a) + c := by
---   apply rational.Equiv.trans _ (rational.add_assoc b a c).symm
---   apply rational.Equiv.trans _ (rational.add_comm b (a + c)).symm
---   apply rational.Equiv.trans _ (rational.add_assoc a c b).symm
---   apply rational.add_eq
---   rfl
---   apply rational.add_comm
+theorem rational.add_perm_a_bc_to_ab_c { a b c: rational } : a + (b + c) ≈ (a + b) + c := calc
+  a + (b + c) ≈ a + b + c  := (rational.add_assoc a b c).symm
 
--- theorem rational.add_perm_a_bc_to_ac_b { a b c: rational } : a + (b + c) ≈ (a + c) + b := by rw [rational.add_comm b, rational.add_assoc]
+#print axioms rational.add_perm_a_bc_to_ab_c
+
+theorem rational.add_perm_a_bc_to_ba_c { a b c: rational } : a + (b + c) ≈ (b + a) + c := calc
+  a + (b + c) ≈ (a + b) + c := (rational.add_assoc _ _ _).symm
+  (a + b) + c ≈ (b + a) + c := by
+    apply rational.add_eq
+    apply rational.add_comm
+    rfl
+
+#print axioms rational.add_perm_a_bc_to_ba_c
+
+theorem rational.add_perm_a_bc_to_ac_b { a b c: rational } : a + (b + c) ≈ (a + c) + b := calc
+  a + (b + c) ≈ a + (c + b) := by
+    apply rational.add_eq
+    rfl
+    apply rational.add_comm
+  a + (c + b) ≈ (a + c) + b := (rational.add_assoc _ _ _).symm
+
+#print axioms rational.add_perm_a_bc_to_ac_b
+
 -- theorem rational.add_perm_a_bc_to_ca_b { a b c: rational } : a + (b + c) ≈ (c + a) + b := by rw [rational.add_comm b, rational.add_assoc, rational.add_comm a c]
 -- theorem rational.add_perm_a_bc_to_bc_a { a b c: rational } : a + (b + c) ≈ (b + c) + a := by rw [rational.add_comm]
 -- theorem rational.add_perm_a_bc_to_cb_a { a b c: rational } : a + (b + c) ≈ (c + b) + a := by rw [rational.add_comm a, rational.add_comm b]
