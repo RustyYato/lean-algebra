@@ -1,4 +1,5 @@
 import Alg.Nat
+import Init.Core
 
 @[simp]
 def nat.add (a b: nat) : nat := match a with
@@ -99,6 +100,16 @@ theorem nat.add_assoc (a b c: nat) : a + (b + c) = (a + b) + c := by
       rw [nat.add_assoc a₀]
 
 #print axioms nat.add_assoc
+
+instance : @Lean.IsAssociative nat (· + ·) where
+  assoc a b c := (nat.add_assoc a b c).symm
+
+instance : @Lean.IsCommutative nat (· + ·) where
+  comm := nat.add_comm
+
+instance : @Lean.IsNeutral nat (· + ·) nat.zero where
+  left_neutral _ := nat.add_zero_left
+  right_neutral _ := nat.add_zero_right
 
 theorem nat.add_perm_a_bc_to_ab_c { a b c: nat } : a + (b + c) = (a + b) + c := by rw [nat.add_assoc]
 theorem nat.add_perm_a_bc_to_ba_c { a b c: nat } : a + (b + c) = (b + a) + c := by rw [nat.add_assoc, nat.add_comm a b]

@@ -1,5 +1,6 @@
 import Alg.Rational.Equiv
 import Alg.Nat.Mul
+import Alg.Nat.Cmp
 
 def rational.add (a b: rational): rational := 
   rational.mk (a.top * b.bot + a.bot * b.top) (a.bot * b.bot) (by
@@ -166,3 +167,93 @@ theorem rational.add_perm_a_bc_to_ac_b { a b c: rational } : a + (b + c) ≈ (a 
 -- theorem rational.add_perm_ab_c_to_ca_b { a b c: rational } : (a + b) + c ≈ (c + a) + b := by rw [rational.add_perm_ab_c_to_a_bc, rational.add_perm_a_bc_to_ca_b]
 -- theorem rational.add_perm_ab_c_to_bc_a { a b c: rational } : (a + b) + c ≈ (b + c) + a := by rw [rational.add_perm_ab_c_to_a_bc, rational.add_perm_a_bc_to_bc_a]
 -- theorem rational.add_perm_ab_c_to_cb_a { a b c: rational } : (a + b) + c ≈ (c + b) + a := by rw [rational.add_perm_ab_c_to_a_bc, rational.add_perm_a_bc_to_cb_a]
+
+class InjectiveIn (r: α -> α -> Prop) (op: α -> α) where
+  injective : r a b -> r (op a) (op b)
+
+class SurjectiveIn (r: α -> α -> Prop) (op: α -> α) where
+  surjective : r (op a) (op b) -> r a b
+
+instance rational.add_inj_left { x } : InjectiveIn rational.equiv (x + ·) where
+  injective := by
+    intro a b eq
+    unfold HAdd.hAdd instHAdd Add Add.add
+    unfold rational.add
+    unfold rational.equiv
+    unfold rational.equiv at eq
+    simp
+    rw [nat.mul_add_right, nat.mul_add_right]
+    conv => {
+      lhs
+      rhs
+      rw [nat.mul_perm_ab_c_to_a_bc]
+      rhs
+      rw [nat.mul_perm_a_bc_to_ac_b]
+      rw [eq]
+      rw [nat.mul_perm_ab_c_to_a_cb]
+    }
+    conv => {
+      lhs
+      rhs
+      rw [nat.mul_perm_a_bc_to_ab_c]
+    }
+    apply nat.add_eq_add _ rfl
+    rw [nat.mul_perm_ab_c_to_a_bc]
+    rw [nat.mul_perm_ab_c_to_a_bc]
+    apply nat.mul_eq_mul rfl
+    rw [nat.mul_perm_a_bc_to_c_ba]
+
+#print axioms rational.add_inj_left
+
+instance rational.add_sur_left { x } : SurjectiveIn rational.equiv (x + ·) where
+  surjective := by
+    intro a b eq
+    unfold HAdd.hAdd instHAdd Add Add.add at eq
+    unfold rational.add at eq
+    unfold rational.equiv at eq
+    unfold rational.equiv
+    simp at *
+
+    rw [nat.mul_add_right, nat.mul_add_right] at eq
+    conv at eq => {
+      repeat rw [nat.mul_perm_ab_c_to_a_bc]
+    }
+    conv at eq => {
+      lhs
+      lhs
+      rhs
+      rw [nat.mul_perm_a_bc_to_c_ba]
+    }
+    have eq := nat.add_irr eq
+    have eq := nat.of_mul_irr_left eq x.bot_nz
+    rw [
+      @nat.mul_perm_a_bc_to_b_ac _ x.bot,
+      @nat.mul_perm_a_bc_to_b_ac _ x.bot,
+    ] at eq
+    exact nat.of_mul_irr_left eq x.bot_nz
+
+#print axioms rational.add_sur_left
+
+instance rational.add_inj_right { x } : InjectiveIn rational.equiv (. + x) where
+  injective := by
+    intro a b eq
+    apply rational.Equiv.trans (rational.add_comm _ _)
+    apply rational.Equiv.trans _ (rational.add_comm _ _)
+    apply rational.add_inj_left.injective eq
+
+#print axioms rational.add_inj_right
+
+instance rational.add_sur_right { x } : SurjectiveIn rational.equiv (. + x) where
+  surjective := by
+    intro a b eq
+    have eq := rational.Equiv.trans (rational.add_comm _ _) eq
+    have eq := rational.Equiv.trans eq (rational.add_comm _ _)
+    apply rational.add_sur_left.surjective eq
+
+#print axioms rational.add_sur_right
+
+instance eqInj : InjectiveIn Eq op where
+  injective := by
+    intro a b eq
+    rw [eq]
+

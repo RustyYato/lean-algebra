@@ -65,6 +65,12 @@ def nat.mul_id_left : a * b = b -> b ≠ .zero -> a = nat.zero.inc := fun muldef
 
 #print axioms nat.mul_id_left
 
+def nat.mul_eq_mul { a b c: nat } : a = c -> b = d -> a * b = c * d := by
+  intro a_eq_c b_eq_d
+  rw [a_eq_c, b_eq_d]
+
+#print axioms nat.mul_eq_mul
+
 def nat.mul_id_right : a * b = a -> a ≠ .zero -> b = nat.zero.inc := fun muldef a_ne_zero => match b with
   | .inc .zero => rfl
   | .zero => (a_ne_zero (by
@@ -141,6 +147,17 @@ def nat.mul_comm (a b: nat) : a * b = b * a := by
   apply nat.mul_comm
 
 #print axioms nat.mul_comm
+
+def nat.of_mul_irr_right { a b c: nat } : a * c = b * c -> c ≠ .zero -> a = b :=
+  nat.of_mul_irr
+    
+#print axioms nat.of_mul_irr_right
+
+def nat.of_mul_irr_left { c a b: nat } : c * a = c * b -> c ≠ .zero -> a = b := by
+  rw [nat.mul_comm c, nat.mul_comm c]
+  apply nat.of_mul_irr_right
+    
+#print axioms nat.of_mul_irr_left
 
 def nat.mul_add_left { a b c: nat } : a * (b + c) = a * b + a * c := by
   cases a
