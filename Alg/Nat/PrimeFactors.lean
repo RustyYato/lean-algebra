@@ -277,12 +277,11 @@ def list_product.eq_one : nat.zero.inc = list_product ns -> ns.allP (fun x => x 
 
 theorem no_factorization_for_zero: PrimeFactorization nat.zero -> False := by
   intro f
-  have := list_product.eq_zero f.eq_n
-  apply f.factors.any_and_all_not this
+  have zero_is_factor := list_product.eq_zero f.eq_n
+  apply f.factors.any_and_all_not zero_is_factor
   apply f.all_primes.map
   intro x xprime x_eq_zero
   rw [←x_eq_zero] at xprime
-  have := zero_not_prime
-  contradiction
+  exact zero_not_prime xprime
 
 #print axioms no_factorization_for_zero
